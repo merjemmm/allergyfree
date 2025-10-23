@@ -1,11 +1,11 @@
-"""Insta485 package initializer."""
+"""Allergy Free package initializer."""
 import flask
 
 # app is a single object used by all the code modules in this package
 app = flask.Flask(__name__)  # pylint: disable=invalid-name
 
 # Read settings from config module (insta485/config.py)
-app.config.from_object('insta485.config')
+app.config.from_object('backend.config')
 
 # Overlay settings read from a Python file whose path is set in the environment
 # variable INSTA485_SETTINGS. Setting this environment variable is optional.
@@ -13,12 +13,13 @@ app.config.from_object('insta485.config')
 #
 # EXAMPLE:
 # $ export INSTA485_SETTINGS=secret_key_config.py
-app.config.from_envvar('INSTA485_SETTINGS', silent=True)
+# app.config.from_envvar('INSTA485_SETTINGS', silent=True)
 
 # Tell our app about views and model.  This is dangerously close to a
 # circular import, which is naughty, but Flask was designed that way.
 # (Reference http://flask.pocoo.org/docs/patterns/packages/)  We're
 # going to tell pylint and pycodestyle to ignore this coding style violation.
-import insta485.api  # noqa: E402  pylint: disable=wrong-import-position
-import insta485.views  # noqa: E402  pylint: disable=wrong-import-position
-import insta485.model  # noqa: E402  pylint: disable=wrong-import-position
+import backend.models # noqa: E402  pylint: disable=wrong-import-position
+import backend.routes  # noqa: E402  pylint: disable=wrong-import-position
+import backend.services  # noqa: E402  pylint: disable=wrong-import-position
+import backend.model  # noqa: E402  pylint: disable=wrong-import-position

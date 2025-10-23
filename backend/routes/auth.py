@@ -3,7 +3,7 @@ import hashlib
 import uuid
 import pathlib
 import flask
-import backend
+import allergyfree
 
 
 # QUESTION: idk what this is checking if we check for logged in in show_index?
