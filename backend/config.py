@@ -18,7 +18,7 @@ SESSION_COOKIE_NAME = 'login'
 
 # File Upload to var/uploads/
 ALL_ROOT = pathlib.Path(__file__).resolve().parent.parent
-UPLOAD_FOLDER = ALL_ROOT/'var'/'uploads'
+UPLOAD_FOLDER = ALL_ROOT/'uploads'
 # FOR DEPLOYING TO AWS USE BELOW:
 # UPLOAD_FOLDER = pathlib.Path('/var/www/uploads')
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])

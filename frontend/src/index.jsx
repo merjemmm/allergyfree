@@ -1,13 +1,8 @@
+// src/index.js
 import React from "react";
-import AuthPage from "./pages/Login";
+import ReactDOM from "react-dom/client";
+import App from "./App";
+import "./index.css";
 
-function App() {
-    console.log("inside of App.jsx");
-
-  return (<div>
-    <h1> HELLO !</h1>
-  </div>);
-  // <AuthPage />;
-}
-
-export default App;
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(<App />);

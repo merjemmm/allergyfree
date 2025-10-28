@@ -12,79 +12,6 @@ def check():
     return jsonify({"status": "ok"})
 
 
-@auth_bp.route('/accounts/login/', methods=['GET'])
-def show_login():
-    """Display /login/ route."""
-    # 1. check if user is logged in
-    # 2. if yes: route to '/'
-    # 3. if no: display form
-
-    if 'username' in flask.session:
-        return flask.redirect(flask.url_for('show_index'))
-
-    return flask.render_template("account_login.html")
-
-
-@auth_bp.route('/accounts/create/', methods=['GET'])
-def show_create():
-    """Display /accounts/create/ route."""
-    # if user is signed in:
-    if 'username' in flask.session:
-        # route to '/accounts/edit/'
-        return flask.redirect("/accounts/edit/")
-
-    return flask.render_template("account_create.html")
-
-
-@auth_bp.route('/accounts/delete/', methods=['GET'])
-def show_delete():
-    """Display /accounts/delete/ route."""
-    if 'username' not in flask.session:
-        return flask.redirect(flask.url_for('show_login'))
-
-    # connection = backend.model.get_db()
-    logname = flask.session.get('username')
-
-    context = {"logname": logname}
-    return flask.render_template("account_delete.html", **context)
-
-
-@auth_bp.route('/accounts/edit/', methods=['GET'])
-def show_edit():
-    """Display /accounts/edit/ route."""
-    if 'username' not in flask.session:
-        return flask.redirect(flask.url_for('show_login'))
-
-    # Connect to database
-    logname = flask.session.get('username')
-    connection = backend.model.get_db()
-
-    cur = connection.execute(
-        """
-        SELECT username, filename, fullname, email
-        FROM users
-        WHERE username = ?
-        """,
-        (logname, )
-    )
-
-    user = cur.fetchone()
-    context = {"logname": logname, "user": user}
-
-    return flask.render_template("account_edit.html", **context)
-
-
-@auth_bp.route('/accounts/password/', methods=['GET'])
-def show_password():
-    """Display /accounts/password/ route."""
-    if 'username' not in flask.session:
-        return flask.redirect(flask.url_for('show_login'))
-
-    logname = flask.session.get('username')
-    context = {"logname": logname}
-    return flask.render_template("account_password.html", **context)
-
-
 @auth_bp.route('/accounts/auth/', methods=['GET'])
 def auth():
     """Check authentication."""
@@ -143,26 +70,15 @@ def handle_login():
         """,
         (username, )
     ).fetchone()
-
-    # ie. the username dne:
+    
     if user_pass is None:
         flask.abort(403)
-
-    user_pass = user_pass['password']
-
-    # split user_pass based off $ to get salt
-    pass_parts = user_pass.split('$')
-
-    algorithm = 'sha512'
-    salt = pass_parts[1]
-    hash_obj = hashlib.new(algorithm)
-    password_salted = salt + password
-    hash_obj.update(password_salted.encode('utf-8'))
-    password_hash = hash_obj.hexdigest()
-    password_db_string = "$".join([algorithm, salt, password_hash])
-
-    if password_db_string != user_pass:
+    
+    # comapre associated hashed password with the input
+    if not check_password_hash(user_pass['password'], password):
         flask.abort(403)
+    
+    #password was correct
 
     # Set a session cookie.
     # Reminder: only store minimal information in a session cookie!

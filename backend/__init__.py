@@ -1,6 +1,6 @@
 """Allergy Free package initializer."""
 from flask_cors import CORS
-from flask import Flask
+from flask import Flask # type: ignore
 import os
 
 def create_app():
