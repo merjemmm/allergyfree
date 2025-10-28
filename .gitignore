@@ -3,3 +3,9 @@
 .DS_Store
 
 env/
+
+node_modules/
+
+allergy-free-frontend/
+
+__pycache__/

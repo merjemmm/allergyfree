@@ -1,4 +1,6 @@
 from dotenv import load_dotenv
+import os
+import pathlib
 
 load_dotenv()
 
@@ -15,7 +17,7 @@ APPLICATION_ROOT = '/'
 SESSION_COOKIE_NAME = 'login'
 
 # File Upload to var/uploads/
-All_ROOT = pathlib.Path(__file__).resolve().parent.parent
+ALL_ROOT = pathlib.Path(__file__).resolve().parent.parent
 UPLOAD_FOLDER = ALL_ROOT/'var'/'uploads'
 # FOR DEPLOYING TO AWS USE BELOW:
 # UPLOAD_FOLDER = pathlib.Path('/var/www/uploads')

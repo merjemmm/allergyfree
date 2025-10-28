@@ -1,14 +1,18 @@
-"""allergyfree accounts view and methods."""
+"""allergyfree backend accounts view and methods."""
 import hashlib
 import uuid
 import pathlib
 import flask
-import allergyfree
+from flask import Blueprint, jsonify
+
+auth_bp = Blueprint("auth", __name__)
+
+@auth_bp.route('/check', methods=['GET'])
+def check():
+    return jsonify({"status": "ok"})
 
 
-# QUESTION: idk what this is checking if we check for logged in in show_index?
-# QUESTION: do all our routes need a "get" method?
-@allergyfree.app.route('/accounts/login/', methods=['GET'])
+@auth_bp.route('/accounts/login/', methods=['GET'])
 def show_login():
     """Display /login/ route."""
     # 1. check if user is logged in
@@ -21,7 +25,7 @@ def show_login():
     return flask.render_template("account_login.html")
 
 
-@allergyfree.app.route('/accounts/create/', methods=['GET'])
+@auth_bp.route('/accounts/create/', methods=['GET'])
 def show_create():
     """Display /accounts/create/ route."""
     # if user is signed in:
@@ -32,20 +36,20 @@ def show_create():
     return flask.render_template("account_create.html")
 
 
-@allergyfree.app.route('/accounts/delete/', methods=['GET'])
+@auth_bp.route('/accounts/delete/', methods=['GET'])
 def show_delete():
     """Display /accounts/delete/ route."""
     if 'username' not in flask.session:
         return flask.redirect(flask.url_for('show_login'))
 
-    # connection = allergyfree.model.get_db()
+    # connection = backend.model.get_db()
     logname = flask.session.get('username')
 
     context = {"logname": logname}
     return flask.render_template("account_delete.html", **context)
 
 
-@allergyfree.app.route('/accounts/edit/', methods=['GET'])
+@auth_bp.route('/accounts/edit/', methods=['GET'])
 def show_edit():
     """Display /accounts/edit/ route."""
     if 'username' not in flask.session:
@@ -53,7 +57,7 @@ def show_edit():
 
     # Connect to database
     logname = flask.session.get('username')
-    connection = allergyfree.model.get_db()
+    connection = backend.model.get_db()
 
     cur = connection.execute(
         """
@@ -70,7 +74,7 @@ def show_edit():
     return flask.render_template("account_edit.html", **context)
 
 
-@allergyfree.app.route('/accounts/password/', methods=['GET'])
+@auth_bp.route('/accounts/password/', methods=['GET'])
 def show_password():
     """Display /accounts/password/ route."""
     if 'username' not in flask.session:
@@ -81,7 +85,7 @@ def show_password():
     return flask.render_template("account_password.html", **context)
 
 
-@allergyfree.app.route('/accounts/auth/', methods=['GET'])
+@auth_bp.route('/accounts/auth/', methods=['GET'])
 def auth():
     """Check authentication."""
     if 'username' in flask.session:
@@ -90,7 +94,7 @@ def auth():
     return flask.abort(403)
 
 
-@allergyfree.app.route('/accounts/logout/', methods=['POST'])
+@auth_bp.route('/accounts/logout/', methods=['POST'])
 def logout():
     """Logout the user."""
     if 'username' not in flask.session:
@@ -101,7 +105,7 @@ def logout():
     return flask.redirect(flask.url_for('show_login'))
 
 
-@allergyfree.app.route('/accounts/', methods=["POST"])
+@auth_bp.route('/accounts/', methods=["POST"])
 def accounts():
     """Accounts Post Routes."""
     if flask.request.form.get('operation') == 'login':
@@ -130,7 +134,7 @@ def handle_login():
 
     # If username and password authentication fails, abort(403)
     # hash this password, compare to user_pass
-    connection = allergyfree.model.get_db()
+    connection = backend.model.get_db()
     user_pass = connection.execute(
         """
         SELECT password
@@ -191,7 +195,7 @@ def handle_create():
     if fileobj.filename == '':
         flask.abort(400)
 
-    connection = allergyfree.model.get_db()
+    connection = backend.model.get_db()
     exis_user = connection.execute(
         """
         SELECT 1
@@ -214,7 +218,7 @@ def handle_create():
     uuid_basename = f"{uuid.uuid4().hex}{suffix}"
 
     # Save to disk
-    fileobj.save(allergyfree.app.config["UPLOAD_FOLDER"]/uuid_basename)
+    fileobj.save(auth_bp.config["UPLOAD_FOLDER"]/uuid_basename)
 
     salt = uuid.uuid4().hex
     hash_obj = hashlib.new('sha512')
@@ -253,7 +257,7 @@ def handle_delete():
         # password = flask.session.get("password")
 
         # TO DO need to check at some point if deleting their own account
-        connection = allergyfree.model.get_db()
+        connection = backend.model.get_db()
         # first get old filename so can delete from sql db
         old_file = connection.execute(
             """
@@ -266,7 +270,7 @@ def handle_delete():
 
         old_file = old_file.fetchone()
         path = pathlib.Path(
-            allergyfree.app.config["UPLOAD_FOLDER"])/old_file['filename']
+            auth_bp.config["UPLOAD_FOLDER"])/old_file['filename']
         path.unlink()
 
         connection.execute(
@@ -305,7 +309,7 @@ def handle_edit_account():
 
         if fileobj:
             # pfp given
-            connection = allergyfree.model.get_db()
+            connection = backend.model.get_db()
             # first get old filename so can delete from sql db
             old_file = connection.execute(
                 """
@@ -319,7 +323,7 @@ def handle_edit_account():
             old_file = old_file.fetchone()
             # file_name = old_file[0]
             path = pathlib.Path(
-                allergyfree.app.config["UPLOAD_FOLDER"])/old_file['filename']
+                auth_bp.config["UPLOAD_FOLDER"])/old_file['filename']
             path.unlink()
 
             # now we need to update the account including the new photo
@@ -336,7 +340,7 @@ def handle_edit_account():
 
             # Save to disk
             path = pathlib.Path(
-                allergyfree.app.config["UPLOAD_FOLDER"])/uuid_basename
+                auth_bp.config["UPLOAD_FOLDER"])/uuid_basename
             fileobj.save(path)
 
             connection.execute(
@@ -353,7 +357,7 @@ def handle_edit_account():
         else:
             # no new photo given
 
-            connection = allergyfree.model.get_db()
+            connection = backend.model.get_db()
             connection.execute(
                 """
                 UPDATE users
@@ -389,7 +393,7 @@ def handle_update_password():
             flask.abort(401)
 
         # compare old password to currently stored password
-        connection = allergyfree.model.get_db()
+        connection = backend.model.get_db()
         user_pass = connection.execute(
             """
             SELECT password
