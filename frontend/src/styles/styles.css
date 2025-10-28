@@ -43,8 +43,7 @@ body {
     margin: 1rem 0 2rem;
 }
 
-.heart::before,
-.heart::after {
+.heart::before {
     content: "";
     position: absolute;
     width: 60px;
@@ -59,7 +58,17 @@ body {
 }
 
 .heart::after {
-    left: 30px;
+    content: "";
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    border: 2px solid #e8827b;
+    border-bottom: none;
+    border-left: none;
+    border-radius: 50%;
+    top: 4px;
+    left: 33px;
+    transform: rotate(45deg);
 }
 
 form {
