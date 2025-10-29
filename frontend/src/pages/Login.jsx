@@ -1,92 +1,97 @@
-import React, { useState } from "react";
-import "../styles/styles.css";
+import { Link } from 'react-router-dom';
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import '../styles/styles.css'
 
-function AuthPage() {
-  const [formData, setFormData] = useState({ username: "", password: "" });
+function LoginPage() {
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
+
+  const handleLogin = (e, username, password) => {
+    // e.preventDefault();
+    console.log("USERNAME: ", username);
+    console.log("PASSWORD: ", password);
+    setError("");
+    console.log("Clicked button");
+    navigate("/journal", { replace: true });
+
+    // try {
+    //   const response = await fetch("http://localhost:5000/api/login", {
+    //     method: "POST",
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //     },
+    //     body: JSON.stringify({ username, password }),
+    //   });
+
+    //   const data = await response.json();
+
+    //   if (response.ok) {
+    //     // "Login successful"
+
+    //     // chatgpt does some token stuff which makes sense but idk the logic behind it 
+    //     // so not including but TODO
+
+    //     navigate("/journal", { replace: true });
+    //   } else {
+    //     // "Invalid credentials"
+    //     setError(data.message || "Invalid credentials");
+    //   }
+    // } catch (error) {
+    //   console.error(err);
+    //   setError("Network error — try again");
+    // }
   };
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await fetch("http://localhost:5000/accounts/login/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-      const data = await response.json();
-      console.log("Login response:", data);
-      // TODO: handle login success (store token, redirect, etc.)
-    } catch (error) {
-      console.error("Error logging in:", error);
-    }
-  };
-
-  const handleSignup = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await fetch("http://localhost:5000/accounts/create", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-      const data = await response.json();
-      console.log("Signup response:", data);
-      // TODO: handle signup success (show message, auto-login, etc.)
-    } catch (error) {
-      console.error("Error signing up:", error);
-    }
-  };
-
-  return (
-    <div className="container">
-      <div className="left">
-        <h1>
-          Allergy Free
-          <br />
-          Around Me
-        </h1>
-      </div>
-
-      <div className="right">
-        <h2>
-          Find the food that
-          <br />
-          loves you back.
-        </h2>
-        <div className="heart"></div>
-        <form>
-          <label>Username</label>
-          <input
-            type="text"
-            name="username"
-            value={formData.username}
-            onChange={handleChange}
-          />
-
-          <label>Password</label>
-          <input
-            type="password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-          />
-
-          <div className="buttons">
-            <button className="signup-btn" onClick={handleSignup}>
-              Sign Up
-            </button>
-            <button className="login-btn" onClick={handleLogin}>
-              Log In --&gt;
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
+	return (
+		<>
+			<div id="sidebar">
+				<h1> Allergy Free Around Me </h1>
+			</div>
+			<div id="login-content">
+				<div id="slogan">
+					<h2>Find the food that loves you back.</h2>
+					<img src="../static/Heart.png"></img>
+				</div>
+				<div id="login-form">
+					<form id="login">
+						<p>
+							<label htmlFor="username">Username</label>
+							<input
+                type="text"
+                id="username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                autoComplete='username'
+                required
+              />
+						</p>
+						<p>
+							<label htmlFor="password">Password</label>
+							<input
+                type="password"
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                autoComplete='current-password'
+                required
+              />
+						</p>
+						<button type="submit" onClick={(e) => handleLogin(e, username, password)}>Login</button>
+						{/* <input type="hidden" name="operation" value="login" /> */}
+					</form>
+					<p>Don't have an account? 
+            <Link to="/signup">
+              Sign Up!
+            </Link>
+          </p>
+				</div>
+			</div>
+		</>
+	)
 }
 
-export default AuthPage;
+export default LoginPage;

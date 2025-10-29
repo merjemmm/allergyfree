@@ -1,23 +1,28 @@
 // frontend/src/App.js
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route} from 'react-router-dom';
 import HomePage from "./pages/Home";
-import ProfilePage from "./pages/Profile";
+// import ProfilePage from "./pages/Profile";
 import AuthPage from "./pages/Login"
+import SignupPage from "./pages/Signup"
+import JournalPage from "./pages/Journal"
+import RestaurantPage from './pages/Restaurants';
+import CalendarPage from './pages/Calendar';
 
 function App() {
   return (
-    <Router>
+    <BrowserRouter>
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/profile" element={<ProfilePage />} />
-        <Route path="/login" element={<AuthPage />} />
-        <Route path="/restaurants" element={<RestaurantPage />} />
         <Route path="/journal" element={<JournalPage />} />
+        <Route path="/login" element={<AuthPage />} />
+        <Route path="/signup" element={<SignupPage />} />
+        <Route path="/restaurants" element={<RestaurantPage />} />
         <Route path="/calendar" element={<CalendarPage />} />
-        <Route path="/signup" element={<SignUpPage />} />
+        {/* <Route path="/profile" element={<ProfilePage />} /> */}
 
       </Routes>
-    </Router>
+    </BrowserRouter>
   );
 }
 export default App;
+
