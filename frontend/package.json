@@ -31,7 +31,7 @@
     "eslint-plugin-react": "^7.37.4",
     "eslint-plugin-react-hooks": ">=4.6.0",
     "prettier": "^3.2.4",
-    "react-scripts": "^5.0.1",
+    "react-scripts": "5.0.1",
     "start-server-and-test": "^2.0.3",
     "tmp": "^0.2.1",
     "ts-loader": ">=9.5.1",
@@ -43,7 +43,8 @@
     "dayjs": "^1.11.10",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-infinite-scroll-component": "^6.1.0"
+    "react-infinite-scroll-component": "^6.1.0",
+    "react-router-dom": "^7.9.4"
   },
   "engines": {
     "node": ">=22.0.0"
