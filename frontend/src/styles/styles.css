@@ -1,4 +1,4 @@
-body {
+/* body {
     margin: 0;
     font-family: "Poppins", sans-serif;
     display: flex;
@@ -112,4 +112,84 @@ button {
 
 button:hover {
     opacity: 0.9;
+} */
+
+/* New styles */
+
+body {
+    font-family: "Quicksand", sans-serif;
+    font-weight: thin;
+    background-color: #F0E8C3;
+    color: #46562B;
+}
+
+a {
+    text-decoration: none;
+    color: #46562B;
+    transition: 0.3s;
+}
+
+a:hover {
+    color: #B6C17A;
+}
+
+#sidebar {
+    background-color: #46562B;
+    color: #F0E8C3;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 50%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+#login-content {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 50%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    color: #46562B;
+}
+
+#login-form {
+    width: 50%;
+    place-self: center;
+    
+    p {
+        display: flex;
+        flex-direction: column;
+        text-align: left;
+    }
+}
+
+#login {
+    display: flex;
+    flex-direction: column;
+}
+
+input[type=text] {
+    background-color: white;
+    border: 1px solid #46562B;
+    color: #46562B;
+    border-radius: 8px;
+    padding: 8px 12px;
+}
+
+input[type=submit] {
+    background-color: #46562B;
+    border: 1px solid #46562B;
+    border-radius: 8px;
+    padding: 8px 12px;
+    color: white;
+    font-family: 'Quicksand', sans-serif;
 }
