@@ -10,36 +10,40 @@ function LoginPage() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleLogin = (e, username, password) => {
+    // e.preventDefault();
+    console.log("USERNAME: ", username);
+    console.log("PASSWORD: ", password);
     setError("");
+    console.log("Clicked button");
+    navigate("/journal", { replace: true });
 
-    try {
-      const response = await fetch("http://localhost:5000/api/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ username, password }),
-      });
+    // try {
+    //   const response = await fetch("http://localhost:5000/api/login", {
+    //     method: "POST",
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //     },
+    //     body: JSON.stringify({ username, password }),
+    //   });
 
-      const data = await response.json();
+    //   const data = await response.json();
 
-      if (response.ok) {
-        // "Login successful"
+    //   if (response.ok) {
+    //     // "Login successful"
 
-        // chatgpt does some token stuff which makes sense but idk the logic behind it 
-        // so not including but TODO
+    //     // chatgpt does some token stuff which makes sense but idk the logic behind it 
+    //     // so not including but TODO
 
-        navigate("/profile", { replace: true });
-      } else {
-        // "Invalid credentials"
-        setError(data.message || "Invalid credentials");
-      }
-    } catch (error) {
-      console.error(err);
-      setError("Network error — try again");
-    }
+    //     navigate("/journal", { replace: true });
+    //   } else {
+    //     // "Invalid credentials"
+    //     setError(data.message || "Invalid credentials");
+    //   }
+    // } catch (error) {
+    //   console.error(err);
+    //   setError("Network error — try again");
+    // }
   };
 
 	return (
@@ -55,7 +59,7 @@ function LoginPage() {
 				<div id="login-form">
 					<form id="login">
 						<p>
-							<label for="username">Username</label>
+							<label htmlFor="username">Username</label>
 							<input
                 type="text"
                 id="username"
@@ -66,7 +70,7 @@ function LoginPage() {
               />
 						</p>
 						<p>
-							<label for="password">Password</label>
+							<label htmlFor="password">Password</label>
 							<input
                 type="password"
                 id="password"
@@ -76,7 +80,7 @@ function LoginPage() {
                 required
               />
 						</p>
-						<button type="submit">Login</button>
+						<button type="submit" onClick={(e) => handleLogin(e, username, password)}>Login</button>
 						{/* <input type="hidden" name="operation" value="login" /> */}
 					</form>
 					<p>Don't have an account? 

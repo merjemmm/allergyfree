@@ -13,32 +13,34 @@ function SignupPage() {
         e.preventDefault();
         setError("");
 
-        try {
-        const response = await fetch("http://localhost:5000/api/signup", {
-            method: "POST",
-            headers: {
-            "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ name, username, password }),
-        });
+        navigate("/journal", { replace: true });
 
-        const data = await response.json();
+        // try {
+        // const response = await fetch("http://localhost:5000/api/signup", {
+        //     method: "POST",
+        //     headers: {
+        //     "Content-Type": "application/json",
+        //     },
+        //     body: JSON.stringify({ name, username, password }),
+        // });
 
-        if (response.ok) {
-            // "Login successful"
+        // const data = await response.json();
 
-            // chatgpt does some token stuff which makes sense but idk the logic behind it 
-            // so not including but TODO
+        // if (response.ok) {
+        //     // "Login successful"
 
-            navigate("/profile", { replace: true });
-        } else {
-            // "Invalid credentials"
-            setError(data.message || "Invalid credentials");
-        }
-        } catch (error) {
-        console.error(err);
-        setError("Network error — try again");
-        }
+        //     // chatgpt does some token stuff which makes sense but idk the logic behind it 
+        //     // so not including but TODO
+
+        //     navigate("/journal", { replace: true });
+        // } else {
+        //     // "Invalid credentials"
+        //     setError(data.message || "Invalid credentials");
+        // }
+        // } catch (error) {
+        // console.error(err);
+        // setError("Network error — try again");
+        // }
     };
 
     return (
@@ -86,7 +88,7 @@ function SignupPage() {
                     required
                 />
                 </p>
-                <button type="submit">Register</button>
+                <button type="submit" onClick={handleSubmit}>Register</button>
                 {/* <input type="hidden" name="operation" value="register"/> */}
             </form>
             <p>Already have an account? 

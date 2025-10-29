@@ -4,7 +4,7 @@ import "../styles/styles.css";
 function HomePage() {
 
   return (
-    <div className="container">
+    <div className="main">
       <div className="left">
         <h1>
           Allergy Free
