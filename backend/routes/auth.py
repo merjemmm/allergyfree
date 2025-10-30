@@ -36,7 +36,7 @@ def check():
 
 #     return handle_update_password()
 
-@auth_bp.route('/api/accounts/login', methods=["POST"])
+@auth_bp.route('/login', methods=["POST"])
 def handle_login():
     """Handle logging in."""
     data = request.get_json()  # get the JSON body
