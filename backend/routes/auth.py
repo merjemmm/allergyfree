@@ -11,53 +11,41 @@ auth_bp = Blueprint("auth", __name__)
 def check():
     return jsonify({"status": "ok"})
 
+# @auth_bp.route('/api/accounts/auth/', methods=['GET'])
+# def auth():
+#     """Check authentication."""
+#     if 'username' in flask.session:
+#         return jsonify({"status": "ok"})
 
-@auth_bp.route('/accounts/auth/', methods=['GET'])
-def auth():
-    """Check authentication."""
-    if 'username' in flask.session:
-        return flask.Response(status=200)
+#     return jsonify({"status": "error", "response" : 403})
 
-    return flask.abort(403)
+# @auth_bp.route('/api/accounts/', methods=["POST"])
+# def accounts():
+#     """Accounts Post Routes."""
+#     if flask.request.form.get('operation') == 'login':
+#         return handle_login()
 
+#     if flask.request.form.get('operation') == 'create':
+#         return handle_create()
 
-@auth_bp.route('/accounts/logout/', methods=['POST'])
-def logout():
-    """Logout the user."""
-    if 'username' not in flask.session:
-        return flask.redirect(flask.url_for('show_login'))
+#     if flask.request.form.get('operation') == 'delete':
+#         return handle_delete()
 
-    flask.session.clear()
-    flask.session.pop('username', None)
-    return flask.redirect(flask.url_for('show_login'))
+#     if flask.request.form.get('operation') == 'edit_account':
+#         return handle_edit_account()
 
+#     return handle_update_password()
 
-@auth_bp.route('/accounts/', methods=["POST"])
-def accounts():
-    """Accounts Post Routes."""
-    if flask.request.form.get('operation') == 'login':
-        return handle_login()
-
-    if flask.request.form.get('operation') == 'create':
-        return handle_create()
-
-    if flask.request.form.get('operation') == 'delete':
-        return handle_delete()
-
-    if flask.request.form.get('operation') == 'edit_account':
-        return handle_edit_account()
-
-    return handle_update_password()
-
-
+@auth_bp.route('/api/accounts/login', methods=["POST"])
 def handle_login():
     """Handle logging in."""
-    username = flask.request.form.get('username')
-    password = flask.request.form.get('password')
+    data = request.get_json()  # get the JSON body
+    username = data.get("username")
+    password = data.get("password")
 
     # If the username or password fields are empty, abort(400)
     if not username or not password:
-        flask.abort(400)
+        return jsonify({"status": "error", "response" : 403})
 
     # If username and password authentication fails, abort(403)
     # hash this password, compare to user_pass
@@ -72,33 +60,24 @@ def handle_login():
     ).fetchone()
     
     if user_pass is None:
-        flask.abort(403)
+        return jsonify({"status": "error", "response" : 403})
     
     # comapre associated hashed password with the input
     if not check_password_hash(user_pass['password'], password):
-        flask.abort(403)
-    
-    #password was correct
+        return jsonify({"status": "error", "response" : 403})
 
-    # Set a session cookie.
-    # Reminder: only store minimal information in a session cookie!
-    flask.session['username'] = flask.request.form.get('username')
+    return jsonify({"status": "ok"})
 
-    target = flask.request.args.get('target')
-    if not target:
-        return flask.redirect(flask.url_for('show_index'))
-
-    return flask.redirect(target)
-
-
+@auth_bp.route('/api/accounts/create', methods=["POST"])
 def handle_create():
     """Handle creating account."""
-    username = flask.request.form.get('username')
-    password = flask.request.form.get('password')
-    fullname = flask.request.form.get('fullname')
-    email = flask.request.form.get('email')
-    fileobj = flask.request.files.get('file')
-
+    data = request.get_json()  # get the JSON body
+    username = data.get("username")
+    password = data.get("password")
+    fullname = data.get('fullname')
+    email = data.get('email')
+    # fileobj = flask.request.files.get('file')
+    
     if (
         not username
         or not password
@@ -106,10 +85,10 @@ def handle_create():
         or not email
         or not fileobj
     ):
-        flask.abort(400)
+        return jsonify({"status": "error", "response" : 400})
 
     if fileobj.filename == '':
-        flask.abort(400)
+        return jsonify({"status": "error", "response" : 400})
 
     connection = backend.model.get_db()
     exis_user = connection.execute(
@@ -122,57 +101,39 @@ def handle_create():
     ).fetchone()
 
     if exis_user:
-        flask.abort(409)
+        return jsonify({"status": "error", "response" : 409})
 
-    # CREATE THE USER:
-    # Compute base name (filename without directory).
-    # Use UUID to avoid clashes with existing files,
-    # and ensure that the name is compatible with the filesystem.
-    # For best practice, we ensure uniform file extensions (e.g.
-    # lowercase).
-    suffix = pathlib.Path(fileobj.filename).suffix.lower()
-    uuid_basename = f"{uuid.uuid4().hex}{suffix}"
-
-    # Save to disk
-    fileobj.save(auth_bp.config["UPLOAD_FOLDER"]/uuid_basename)
-
-    salt = uuid.uuid4().hex
-    hash_obj = hashlib.new('sha512')
-    password_salted = salt + password
-    hash_obj.update(password_salted.encode('utf-8'))
-    password_hash = hash_obj.hexdigest()
-    password_db_string = "$".join(['sha512', salt, password_hash])
-
-    connection.execute(
-        """
-        INSERT INTO users(filename, username, password, fullname, email)
-        VALUES(?, ?, ?, ?, ?)
-        """,
-        (uuid_basename, username, password_db_string, fullname, email)
-    )
-    connection.commit()
-
-    # log the user in and redirect:
-    flask.session['username'] = username
-
-    target = flask.request.args.get('target')
-    if not target:
-        return flask.redirect(flask.url_for('show_index'))
-
-    return flask.redirect(target)
+    conn = backend.model.get_db()
+    # created the hash automatically instead of before with manual calc
+    password_hash = generate_password_hash(password)
+    try:
+        c.execute(
+            "INSERT INTO users (username, email, password_hash) VALUES (?, ?, ?)",
+            (username, email, password_hash),
+        )
+        conn.commit()
+    except sqlite3.IntegrityError:
+        conn.close()
+        return jsonify({"status": "User Exists"})
+    
+    
+    conn.close()
+    return jsonify({"status": "ok"})
 
 
+@auth_bp.route('/api/accounts/delete', methods=["POST"])
 def handle_delete():
     """Display /accounts/delete/ route."""
     if 'username' not in flask.session:
         # this means the user isn't logged in so we should abort
-        flask.abort(403)
+        return jsonify({"status": "error", "response" : 403})
 
     else:
-        username = flask.session.get('username')
-        # password = flask.session.get("password")
+        data = request.get_json()  # get the JSON body
+        username = data.get("username")
 
-        # TO DO need to check at some point if deleting their own account
+
+
         connection = backend.model.get_db()
         # first get old filename so can delete from sql db
         old_file = connection.execute(
@@ -208,20 +169,22 @@ def handle_delete():
         return flask.redirect(target)
 
 
+@auth_bp.route('/api/accounts/edit', methods=["POST"])
 def handle_edit_account():
     """Display /accounts/edit/ route."""
     if 'username' not in flask.session:
-        flask.abort(403)
+        return jsonify({"status": "error", "response" : 403})
 
     else:
-        username = flask.session.get('username')
+        data = request.get_json()  # get the JSON body
+        username = data.get("username")
 
-        fullname = flask.request.form.get('fullname')
-        email = flask.request.form.get('email')
-        fileobj = flask.request.files.get('file')
+        fullname = data.get('fullname')
+        email = data.get('email')
+        fileobj = data.get('file')
 
         if not (fullname or email):
-            flask.abort(400)
+            return jsonify({"status": "error", "response" : 403})
 
         if fileobj:
             # pfp given
@@ -245,11 +208,6 @@ def handle_edit_account():
             # now we need to update the account including the new photo
             filename = fileobj.filename
 
-            # Compute base name (filename without directory).
-            # We use a UUID to avoid clashes with existing files,
-            # and ensure that the name is compatible with the filesystem.
-            # For best practive, we ensure uniform file extensions (e.g.
-            # lowercase).
             stem = uuid.uuid4().hex
             suffix = pathlib.Path(filename).suffix.lower()
             uuid_basename = f"{stem}{suffix}"
@@ -286,27 +244,30 @@ def handle_edit_account():
 
         target = flask.request.args.get('target')
         if not target:
-            return flask.redirect(flask.url_for('show_index'))
+            # return flask.redirect(flask.url_for('show_index'))
+            return jsonify({"status": "error", "response" : 403})
 
-        return flask.redirect(target)
+        return jsonify({"status": "ok", "response" : 200})
 
 
 def handle_update_password():
     """Update user password."""
     if 'username' not in flask.session:
-        flask.abort(403)
+        return jsonify({"status": "error", "response" : 403})
 
     else:
-        username = flask.session.get('username')
-        new_password1 = flask.request.form.get('new_password1')
-        new_password2 = flask.request.form.get('new_password2')
-        old_password = flask.request.form.get('password')
+        data = request.get_json()  # get the JSON body
+        username = data.get("username")
+
+        new_password1 = data.get('new_password1')
+        new_password2 = data.get('new_password2')
+        old_password = data.get('password')
 
         if not new_password1 or not new_password2 or not old_password:
-            flask.abort(400)
+            return jsonify({"status": "error", "response" : 400})
 
         if new_password1 != new_password2:
-            flask.abort(401)
+            return jsonify({"status": "error", "response" : 401})
 
         # compare old password to currently stored password
         connection = backend.model.get_db()
@@ -322,40 +283,25 @@ def handle_update_password():
 
         # ie. the username dne:
         if not user_pass:
-            flask.abort(403)
+            return jsonify({"status": "error", "response" : 403})
+    
+        # comapre associated hashed password with the input
+        if not check_password_hash(user_pass['password'], password):
+            return jsonify({"status": "error", "response" : 403})
 
-        # split user_pass based off $ to get salt
-        salt = user_pass.split('$')[1]
-        hash_obj = hashlib.new('sha512')
-        password_salted = salt + old_password
-        hash_obj.update(password_salted.encode('utf-8'))
-        password_db_string = "$".join(['sha512', salt, hash_obj.hexdigest()])
-
-        if password_db_string != user_pass:
-            flask.abort(403)
-        # we have confirmed old password is true password
-
-        # create new password using hash and salt
-        new_salt = uuid.uuid4().hex
-        sec_hash_obj = hashlib.new('sha512')
-        new_salted_pass = new_salt + new_password1
-        sec_hash_obj.update(new_salted_pass.encode('utf-8'))
-        storing_password = "$".join(['sha512', new_salt,
-                                     sec_hash_obj.hexdigest()])
-
+        password_hash = generate_password_hash(password)
         connection.execute(
             """
             UPDATE users
             SET password = ?
             WHERE username = ?
             """,
-            (storing_password, username)
+            (password_hash, username)
         )
 
         connection.commit()
 
-    target = flask.request.args.get("target")
     if not target:
-        return flask.redirect(flask.url_for('show_index'))
+        return jsonify({"status": "error", "response" : 403})
 
-    return flask.redirect(target)
+    return jsonify({"status": "ok", "response" : 200})
