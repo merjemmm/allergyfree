@@ -550,3 +550,164 @@ textarea {
   padding: 0.5rem 1rem;
   cursor: pointer;
 }
+
+
+/* ===== Profile ===== */
+    .wrap{
+      max-width:1200px;
+      margin:24px auto;
+      padding:0 18px;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr 1.05fr;
+      gap:24px;
+      align-items:start;
+    }
+
+    .card{
+      background:var(--panel);
+      border-radius:14px;
+      padding:20px;
+      box-shadow: var(--shadow);
+    }
+
+    .profile-card h2, .add-symptom h2, .symptoms-card h2{
+      margin:0 0 12px 0;
+      color:var(--dark-green);
+      font-weight:600;
+      font-size:1.6rem;
+    }
+
+    .label{
+      display:block;
+      font-size:0.9rem;
+      color:var(--muted);
+      margin-top:12px;
+      margin-bottom:6px;
+    }
+    input[type="text"], input[type="email"], input[type="password"], select, textarea{
+      width:100%;
+      padding:10px 12px;
+      border-radius:8px;
+      border:1px solid #e3e3d0;
+      background:#fbfbfa;
+      font-size:0.95rem;
+      outline:none;
+    }
+    textarea{min-height:86px; resize:vertical}
+
+    .update-btn{
+      margin-top:14px;
+      width:100%;
+      background:var(--dark-green);
+      color:white;
+      border:none;
+      padding:10px 12px;
+      border-radius:999px;
+      cursor:pointer;
+      font-weight:600;
+    }
+
+    .add-symptom{
+      margin-top:18px;
+    }
+    .add-symptom .add-btn{
+      margin-top:10px;
+      background:var(--dark-green);
+      color:white;
+      padding:8px 12px;
+      border-radius:8px;
+      border:none;
+      cursor:pointer;
+    }
+
+    .symptoms-card{
+      padding:18px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+
+    .tag-list{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      align-items:flex-start;
+      padding:8px 4px;
+      background:rgba(0,0,0,0.02);
+      border-radius:10px;
+      max-height:220px;
+      overflow:auto;
+    }
+
+    .pill{
+      padding:8px 12px;
+      border-radius:var(--pill-radius);
+      font-size:0.9rem;
+      color:#2a2a2a;
+      display:inline-block;
+      box-shadow:0 2px 0 rgba(0,0,0,0.03);
+      cursor:pointer;
+      user-select:none;
+    }
+
+    .pill.pink{ background:#f6b8b8; }
+    .pill.orange{ background:#f1caa4; }
+    .pill.green{ background:#dfe8a9; }
+    .pill.blue{ background:#cfe3ff; }
+    .pill.purple{ background:#d6ccf5; }
+
+    .symptoms-list{
+      margin-top:6px;
+      background:var(--panel);
+      border-radius:10px;
+      padding:12px;
+      box-shadow: var(--shadow);
+      max-height:360px;
+      overflow:auto;
+      border:1px solid #eee9d8;
+    }
+
+    .symptoms-section{
+      margin-bottom:14px;
+    }
+    .symptoms-section h3{
+      margin:0 0 6px 0;
+      color:var(--dark-green);
+      font-size:1.05rem;
+      font-weight:600;
+    }
+
+    /* bottom controls */
+    .controls{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      margin-top:12px;
+    }
+    .controls select{
+      flex:1;
+      padding:8px;
+      border-radius:8px;
+      border:1px solid #e3e3d0;
+      background:#fbfbfa;
+    }
+    .controls .delete{
+      background:#dfe7c2;
+      border:1px solid #c7caa6;
+      padding:8px 14px;
+      border-radius:8px;
+      cursor:pointer;
+    }
+
+    /* small utilities */
+    .muted{ color:var(--muted); font-size:0.9rem }
+    .spaced{ margin-top:12px }
+
+    /* ===== Responsive ===== */
+    @media (max-width:980px){
+      .grid{ grid-template-columns: 1fr; }
+      .wrap{ padding:14px; }
+    }

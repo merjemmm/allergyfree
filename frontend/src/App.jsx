@@ -1,7 +1,7 @@
 // frontend/src/App.js
 import { BrowserRouter, Routes, Route} from 'react-router-dom';
 import HomePage from "./pages/Home";
-// import ProfilePage from "./pages/Profile";
+import ProfilePage from "./pages/Profile";
 import AuthPage from "./pages/Login"
 import SignupPage from "./pages/Signup"
 import JournalPage from "./pages/Journal"
@@ -18,7 +18,7 @@ function App() {
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/restaurants" element={<RestaurantPage />} />
         <Route path="/calendar" element={<CalendarPage />} />
-        {/* <Route path="/profile" element={<ProfilePage />} /> */}
+        <Route path="/profile" element={<ProfilePage />} />
 
       </Routes>
     </BrowserRouter>
