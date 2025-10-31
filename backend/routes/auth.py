@@ -3,7 +3,7 @@ import hashlib
 import uuid
 import pathlib
 import flask
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, session
 
 auth_bp = Blueprint("auth", __name__)
 
@@ -65,6 +65,9 @@ def handle_login():
     # comapre associated hashed password with the input
     if not check_password_hash(user_pass['password'], password):
         return jsonify({"status": "error", "response" : 403})
+    
+    # set session username
+    session["username"] = username
 
     return jsonify({"status": "ok"})
 

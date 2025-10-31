@@ -5,18 +5,46 @@ from flask import Blueprint, jsonify
 calendar_bp = Blueprint("auth", __name__)
 
 
-@calendar_bp.route('/check', methods=['GET'])
+@calendar_bp.route('/api/calendar/check', methods=['GET'])
 def check():
     return jsonify({"status": "ok"})
 
 
-@calendar_bp.route('/', methods=['GET'])
+@calendar_bp.route('/api/calendar', methods=['GET'])
 def get_journal():
-    # Return all entries by day, idk how much of this backend vs frontend honestly
-
-    # Responses:
-    # Success
-    # Fail
+    # Return all entries for month, 
     
-    return jsonify({"status": "success"})
+    calendar_entries = []
+    
+    
+    if True:
+        return jsonify({ "status" : "fail",
+                        "Message" : "error retrieving calendar entries",
+                        "Status code" : 403,
+                        "Data" : [] })
+
+    
+    return jsonify({ "status" : "success",
+                    "Message" : "Calendar entries retrieved",
+                    "Status code" : 200,
+                    "Data" : calendar_entries})
+    
+
+def get_journal_today():
+    # Return all entries for today day only
+    # datetime.utcnow()
+    
+    calendar_today = []
+
+    if True:
+        return jsonify({ "status" : "fail",
+                        "Message" : "error retrieving calendar entries",
+                        "Status code" : 403,
+                        "Data" : [] })
+    
+    return jsonify({ "status" : "success",
+                    "Message" :  "Calendar entries for today retrieved",
+                    "Status code" : 200,
+                    "Data" : calendar_today})
+
 
