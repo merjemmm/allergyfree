@@ -2,7 +2,7 @@
 import flask
 from flask import Blueprint, jsonify
 
-calendar_bp = Blueprint("auth", __name__)
+calendar_bp = Blueprint("calendar", __name__)
 
 
 @calendar_bp.route('/api/calendar/check', methods=['GET'])

@@ -2,7 +2,7 @@
 import flask
 from flask import Blueprint, jsonify
 
-journal_bp = Blueprint("auth", __name__)
+journal_bp = Blueprint("journal", __name__)
 
 
 @journal_bp.route('/api/journal/check', methods=['GET'])

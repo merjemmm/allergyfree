@@ -5,7 +5,7 @@ import pathlib
 load_dotenv()
 
 SECRET_KEY = os.getenv("SECRET_KEY", "devsecret")  # used later for sessions/JWTs
-DATABASE_FILENAME = os.getenv("DB_PATH", "backend/app.db")
+DATABASE_FILENAME = os.getenv("DB_PATH", "backend/curr_db/app.db")
 
 APPLICATION_ROOT = '/'
 

@@ -1,12 +1,16 @@
+
+# Secrets
 .env
 .envs/
+
+# Generic
 .vscode
 .DS_Store
+__pycache__/
 
+# Python environment
 env/
-
 node_modules/
 
-allergy-free-frontend/
-
-__pycache__/
+# Loval DB
+curr_db/

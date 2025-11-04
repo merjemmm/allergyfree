@@ -5,7 +5,7 @@ import pathlib
 import flask
 from flask import Blueprint, jsonify
 
-profile_bp = Blueprint("auth", __name__)
+profile_bp = Blueprint("profile", __name__)
 
 @profile_bp.route('/check', methods=['GET'])
 def check():

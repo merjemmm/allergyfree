@@ -2,8 +2,10 @@
 import hashlib
 import uuid
 import pathlib
-import flask
-from flask import Blueprint, jsonify, session
+from backend.model import get_db
+import sqlite3
+from flask import Blueprint, jsonify, session, request
+from werkzeug.security import generate_password_hash, check_password_hash
 
 auth_bp = Blueprint("auth", __name__)
 
@@ -36,6 +38,7 @@ def check():
 
 #     return handle_update_password()
 
+
 @auth_bp.route('/login', methods=["POST"])
 def handle_login():
     """Handle logging in."""
@@ -49,7 +52,7 @@ def handle_login():
 
     # If username and password authentication fails, abort(403)
     # hash this password, compare to user_pass
-    connection = backend.model.get_db()
+    connection = get_db()
     user_pass = connection.execute(
         """
         SELECT password
@@ -71,29 +74,29 @@ def handle_login():
 
     return jsonify({"status": "ok"})
 
-@auth_bp.route('/api/accounts/create', methods=["POST"])
+
+# curl -X POST http://127.0.0.1:5000/api/accounts/create \
+#       -H 'Content-Type: application/json' \
+#       -d '{ "fullname" : "Mer Jem", "username" : "merm", "password" : "abcd", "email" : "merm@gmail.com" }'
+
+@auth_bp.route('/create', methods=["POST"])
 def handle_create():
     """Handle creating account."""
     data = request.get_json()  # get the JSON body
     username = data.get("username")
     password = data.get("password")
-    fullname = data.get('fullname')
-    email = data.get('email')
-    # fileobj = flask.request.files.get('file')
+    fullname = data.get("fullname")
+    email = data.get("email")
     
     if (
         not username
         or not password
         or not fullname
         or not email
-        or not fileobj
     ):
         return jsonify({"status": "error", "response" : 400})
 
-    if fileobj.filename == '':
-        return jsonify({"status": "error", "response" : 400})
-
-    connection = backend.model.get_db()
+    connection = get_db()
     exis_user = connection.execute(
         """
         SELECT 1
@@ -106,13 +109,13 @@ def handle_create():
     if exis_user:
         return jsonify({"status": "error", "response" : 409})
 
-    conn = backend.model.get_db()
+    conn = get_db()
     # created the hash automatically instead of before with manual calc
     password_hash = generate_password_hash(password)
     try:
-        c.execute(
-            "INSERT INTO users (username, email, password_hash) VALUES (?, ?, ?)",
-            (username, email, password_hash),
+        conn.execute(
+            "INSERT INTO users (username, fullname, email, password) VALUES (?, ?, ?, ?)",
+            (username, fullname, email, password_hash),
         )
         conn.commit()
     except sqlite3.IntegrityError:
@@ -124,7 +127,7 @@ def handle_create():
     return jsonify({"status": "ok"})
 
 
-@auth_bp.route('/api/accounts/delete', methods=["POST"])
+@auth_bp.route('/delete', methods=["POST"])
 def handle_delete():
     """Display /accounts/delete/ route."""
     if 'username' not in flask.session:
@@ -137,7 +140,7 @@ def handle_delete():
 
 
 
-        connection = backend.model.get_db()
+        connection = get_db()
         # first get old filename so can delete from sql db
         old_file = connection.execute(
             """
@@ -172,7 +175,7 @@ def handle_delete():
         return flask.redirect(target)
 
 
-@auth_bp.route('/api/accounts/edit', methods=["POST"])
+@auth_bp.route('/edit', methods=["POST"])
 def handle_edit_account():
     """Display /accounts/edit/ route."""
     if 'username' not in flask.session:
@@ -191,7 +194,7 @@ def handle_edit_account():
 
         if fileobj:
             # pfp given
-            connection = backend.model.get_db()
+            connection = get_db()
             # first get old filename so can delete from sql db
             old_file = connection.execute(
                 """
@@ -234,7 +237,7 @@ def handle_edit_account():
         else:
             # no new photo given
 
-            connection = backend.model.get_db()
+            connection = get_db()
             connection.execute(
                 """
                 UPDATE users
@@ -273,7 +276,7 @@ def handle_update_password():
             return jsonify({"status": "error", "response" : 401})
 
         # compare old password to currently stored password
-        connection = backend.model.get_db()
+        connection = get_db()
         user_pass = connection.execute(
             """
             SELECT password

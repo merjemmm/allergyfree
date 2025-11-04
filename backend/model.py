@@ -20,8 +20,9 @@ def get_db():
     https://flask.palletsprojects.com/en/1.0.x/appcontext/#storing-data
     """
     if 'sqlite_db' not in flask.g:
-        db_filename = backend.app.config['DATABASE_FILENAME']
-        flask.g.sqlite_db = sqlite3.connect(str(db_filename))
+        db_filename = flask.current_app.config['DATABASE_FILENAME']
+        print(db_filename)
+        flask.g.sqlite_db = sqlite3.connect(db_filename)
         flask.g.sqlite_db.row_factory = dict_factory
 
         # Foreign keys have to be enabled per-connection.  This is an sqlite3
@@ -30,8 +31,6 @@ def get_db():
 
     return flask.g.sqlite_db
 
-
-@backend.app.teardown_appcontext
 def close_db(error):
     """Close the database at the end of a request.
 

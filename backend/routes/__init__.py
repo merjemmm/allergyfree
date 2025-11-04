@@ -9,7 +9,7 @@ def register_routes(app):
     # Register all blueprints here
     app.register_blueprint(auth_bp, url_prefix="/api/accounts/")
     app.register_blueprint(calendar_bp, url_prefix="/api/calendar/")
-    app.register_blueprint(journal_bp, url_prefix="/api/calendar/")
-    app.register_blueprint(profile_bp, url_prefix="/api/calendar/")
-    app.register_blueprint(restaurants_bp, url_prefix="/api/calendar/")
+    app.register_blueprint(journal_bp, url_prefix="/api/journal/")
+    app.register_blueprint(profile_bp, url_prefix="/api/profile/")
+    app.register_blueprint(restaurants_bp, url_prefix="/api/restaurants/")
 
