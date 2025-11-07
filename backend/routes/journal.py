@@ -5,13 +5,13 @@ from flask import Blueprint, jsonify
 journal_bp = Blueprint("journal", __name__)
 
 
-@journal_bp.route('/api/journal/check', methods=['GET'])
+@journal_bp.route('/check', methods=['GET'])
 def check():
     return jsonify({"status": "ok"})
 
 
 # thi includes a query parameter ?month=xyz&year=xyz
-@journal_bp.route('/api/journal', methods=['GET'])
+@journal_bp.route('/entries', methods=['GET'])
 def get_journal():
     # Return all journal entries for a person
     month = request.args.get("month")
@@ -60,7 +60,7 @@ def get_journal():
 #                     "data" : journal_entries})
 
 
-@journal_bp.route('/api/journal/addentry', methods=['POST'])
+@journal_bp.route('/addentry', methods=['POST'])
 def add_journal():
     # Add new journal entry for a person, another db call
 
