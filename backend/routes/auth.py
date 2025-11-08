@@ -1,6 +1,4 @@
 """allergyfree backend accounts view and methods."""
-import hashlib
-import uuid
 import pathlib
 from backend.model import get_db
 import sqlite3
@@ -13,30 +11,10 @@ auth_bp = Blueprint("auth", __name__)
 def check():
     return jsonify({"status": "ok"})
 
-# @auth_bp.route('/api/accounts/auth/', methods=['GET'])
-# def auth():
-#     """Check authentication."""
-#     if 'username' in flask.session:
-#         return jsonify({"status": "ok"})
 
-#     return jsonify({"status": "error", "response" : 403})
-
-# @auth_bp.route('/api/accounts/', methods=["POST"])
-# def accounts():
-#     """Accounts Post Routes."""
-#     if flask.request.form.get('operation') == 'login':
-#         return handle_login()
-
-#     if flask.request.form.get('operation') == 'create':
-#         return handle_create()
-
-#     if flask.request.form.get('operation') == 'delete':
-#         return handle_delete()
-
-#     if flask.request.form.get('operation') == 'edit_account':
-#         return handle_edit_account()
-
-#     return handle_update_password()
+# curl -X POST http://127.0.0.1:5000/api/accounts/login \
+#       -H 'Content-Type: application/json' \
+#         -d '{"username" : "merm", "password" : "abcd"}'
 
 @auth_bp.route('/login', methods=["POST"])
 def handle_login():
@@ -51,7 +29,7 @@ def handle_login():
                         "message" : "Missing username or password",
                         "statusCode" : 403 })
 
-    # If username and password authentication fails, abort(403)
+    # If username and password authentication fails, return 403)
     # hash this password, compare to user_pass
     connection = get_db()
     user_pass = connection.execute(
@@ -141,36 +119,59 @@ def handle_create():
                     "statusCode" : 200 })
 
 
-@auth_bp.route('/delete', methods=["POST"])
+# curl -X DELETE http://127.0.0.1:5000/api/account/delete
+@auth_bp.route('/delete', methods=["DELETE"])
 def handle_delete():
     """Display /accounts/delete/ route."""
-    if 'username' not in flask.session:
-        # this means the user isn't logged in so we should abort
-        return jsonify({"status" : "fail",
-                        "message" : "No current user",
-                        "statusCode" : 403 })
+    # if 'username' not in flask.session:
+    #     # this means the user isn't logged in so we should abort
+    #     return jsonify({"status" : "fail",
+    #                     "message" : "No current user",
+    #                     "statusCode" : 403 })
 
-    else:
-        data = request.get_json()  # get the JSON body
-        username = data.get("username")
+    # else:
+        
+    username = "merm"
 
-        connection = get_db()
+    connection = get_db()
 
-        connection.execute(
-            """
-            DELETE FROM users
-            WHERE username = ?
-            """,
-            (username, )
-        )
-        connection.commit()
+    connection.execute(
+        """
+        DELETE FROM users
+        WHERE username = ?
+        """,
+        (username, )
+    )
+    connection.commit()
 
-        flask.session.clear()
-        # flask.session.pop('username', None)
-        connection.close()
+    session.clear()
+    # flask.session.pop('username', None)
+    connection.close()
        
     return jsonify({"status" : "success",
                     "message" : "User deleted successfully",
                     "statusCode" : 200 })
+
+# curl -X GET http://127.0.0.1:5000/api/account/baseuser
+
+@auth_bp.route('/<string:username>/', methods=["GET"])
+def get_user(username):
+    """Display /accounts/delete/ route."""
+    conn = get_db()
+    exis_user = conn.execute(
+        """
+        SELECT *
+        FROM users
+        WHERE username = ?
+        """,
+        (username, )
+    ).fetchall()
+    
+    conn.close()
+
+    return jsonify({"status" : "success",
+                    "message" : "User retrieved successfully",
+                    "statusCode" : 200,
+                    "data" : exis_user})
     
     

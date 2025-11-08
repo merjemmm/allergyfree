@@ -36,7 +36,9 @@ def get_entries():
     if not year:
         # we will default the year to the current year
         year = datetime.now().year
-       
+    
+    # TODO = might be able to change storing of date to make it more efficient
+    # if we use datetime and extract day, month, year
     if not day: 
         calendar_entries = conn.execute(
             """

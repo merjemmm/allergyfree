@@ -1,5 +1,6 @@
 """allergyfree backend for journal page"""
 import flask
+from backend.model import get_db
 from flask import Blueprint, jsonify
 
 journal_bp = Blueprint("journal", __name__)
