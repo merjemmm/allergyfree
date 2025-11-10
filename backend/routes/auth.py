@@ -123,30 +123,30 @@ def handle_create():
 @auth_bp.route('/delete', methods=["DELETE"])
 def handle_delete():
     """Display /accounts/delete/ route."""
-    # if 'username' not in flask.session:
-    #     # this means the user isn't logged in so we should abort
-    #     return jsonify({"status" : "fail",
-    #                     "message" : "No current user",
-    #                     "statusCode" : 403 })
+    if 'username' not in flask.session:
+        # this means the user isn't logged in so we should abort
+        return jsonify({"status" : "fail",
+                        "message" : "No current user",
+                        "statusCode" : 403 })
 
-    # else:
+    else:
         
-    username = "merm"
+        username = "merm"
 
-    connection = get_db()
+        connection = get_db()
 
-    connection.execute(
-        """
-        DELETE FROM users
-        WHERE username = ?
-        """,
-        (username, )
-    )
-    connection.commit()
+        connection.execute(
+            """
+            DELETE FROM users
+            WHERE username = ?
+            """,
+            (username, )
+        )
+        connection.commit()
 
-    session.clear()
-    # flask.session.pop('username', None)
-    connection.close()
+        session.clear()
+        # flask.session.pop('username', None)
+        connection.close()
        
     return jsonify({"status" : "success",
                     "message" : "User deleted successfully",
