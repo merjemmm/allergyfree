@@ -131,7 +131,7 @@ def handle_delete():
 
     else:
         
-        username = "merm"
+        username = session["username"]
 
         connection = get_db()
 

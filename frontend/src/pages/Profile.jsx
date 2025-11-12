@@ -103,9 +103,9 @@ function ProfilePage() {
             </div>
             </div>
 
-            <div className="symptoms-list">
+            {/* <div className="symptoms-list">
             <p className="muted">Selected symptoms or additional options would appear here. This panel is scrollable when long.</p>
-            </div>
+            </div> */}
 
             <div className="controls">
             <select>
