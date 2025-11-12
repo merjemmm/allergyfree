@@ -16,7 +16,8 @@ function LoginPage() {
     console.log("PASSWORD: ", password);
     setError("");
     console.log("Clicked button");
-    navigate("/journal", { replace: true });
+    // send to Profile page by default upon login
+    navigate("/Profile", { replace: true });
 
     // try {
     //   const response = await fetch("http://localhost:5000/api/login", {
@@ -81,7 +82,7 @@ function LoginPage() {
               />
 						</p>
 						<button type="submit" onClick={(e) => handleLogin(e, username, password)}>Login</button>
-						{/* <input type="hidden" name="operation" value="login" /> */}
+						<input type="hidden" name="operation" value="login" />
 					</form>
 					<p>Don't have an account? 
             <Link to="/signup">
