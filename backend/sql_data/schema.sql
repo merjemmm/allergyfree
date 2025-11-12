@@ -30,8 +30,8 @@ CREATE TABLE symptoms(
   year INTEGER NOT NULL,
   type VARCHAR(20) NOT NULL,
   notes VARCHAR(200) NOT NULL,
-  symptom  VARCHAR(20) NOT NULL,
-  FOREIGN KEY(adder) REFERENCES users(username) ON DELETE CASCADE
+  symptom VARCHAR(20) NOT NULL,
+  FOREIGN KEY(adder) REFERENCES users(username) ON DELETE CASCADE,
   FOREIGN KEY(symptom) REFERENCES symptomCategories(symptom) ON DELETE CASCADE
 );
 
@@ -39,8 +39,8 @@ CREATE TABLE symptoms(
 -- TODO, need some db or otherwise that says what symptoms a user has chosen
 CREATE TABLE symptomCategories(
   symptomid INTEGER PRIMARY KEY AUTOINCREMENT,
-  symptom VARCHAR(40) NOT NULL,
-  type  VARCHAR(40) NOT NULL,
+  symptom VARCHAR(40) NOT NULL UNIQUE,
+  type VARCHAR(40) NOT NULL
 );
 
 -- tracks foods they have eaten
@@ -52,6 +52,5 @@ CREATE TABLE journal(
   year INTEGER NOT NULL,
   meal VARCHAR(20) NOT NULL,
   name VARCHAR(20) NOT NULL,
-
   FOREIGN KEY(adder) REFERENCES users(username) ON DELETE CASCADE
 );
