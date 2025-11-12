@@ -13,7 +13,7 @@ function SignupPage() {
         e.preventDefault();
         setError("");
 
-        navigate("/journal", { replace: true });
+        navigate("/signup", { replace: true });
 
         // try {
         // const response = await fetch("http://localhost:5000/api/signup", {

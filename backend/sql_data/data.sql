@@ -1,13 +1,22 @@
 PRAGMA foreign_keys = ON;
 
-INSERT INTO users(username, fullname, email, filename, password)
+INSERT INTO users(username, fullname, email, password)
 VALUES 
-    ('baseuser', 'Base User', 'baseusero@umich.edu', '',
-    'sha512$34e94a05cdf247db92a84bc590950336$7eaca2b4169e042120f015666115856c717343f1c75d1c1bd1bf469bd1cd439eb152ccda6a0b8703706dfbcb861b3cef9208325c31f436e8edb9563f01176c48'
+    ('baseuser', 'Base User', 'baseusero@umich.edu', 'pass'
     );
 
 -- + sqlite3 -batch -line var/insta485.sqlite3 'SELECT * FROM posts'
-INSERT INTO restaurants(postid, location, name, adder, created)
+INSERT INTO restaurants(location, name, adder, goodexp)
 VALUES
-    (1, "Ann Arbor", "Bodego Bros", "basicuser");
+    ('Ann Arbor', 'Bodego Bros', 'baseuser', TRUE);
 
+INSERT INTO symptoms(adder, day, month, year, type, notes)
+VALUES
+    ('baseuser', 1, 10, 2025, 'brain', 'bad pain'),
+    ('baseuser', 2, 10, 2025, 'brain', 'bad pain'),
+    ('baseuser', 3, 10, 2025, 'brain', 'bad pain');
+
+
+-- INSERT INTO journal(location, name, adder)
+-- VALUES
+--     ("Ann Arbor", "Bodego Bros", '1');

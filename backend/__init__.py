@@ -1,6 +1,7 @@
 """Allergy Free package initializer."""
 from flask_cors import CORS
 from flask import Flask # type: ignore
+from backend.model import close_db
 import os
 
 def create_app():
@@ -16,6 +17,8 @@ def create_app():
     # --- Initialize Database ---
     # from backend.models.model import init_db_command
     # app.cli.add_command(init_db_command)
+    
+    # app.teardown_appcontext(close_db)
 
 
     app.config.from_object('backend.config')

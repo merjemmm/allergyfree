@@ -1,45 +1,82 @@
 """allergyfree backend for journal page"""
 import flask
+from backend.model import get_db
 from flask import Blueprint, jsonify
 
-journal_bp = Blueprint("auth", __name__)
+journal_bp = Blueprint("journal", __name__)
 
 
-@journal_bp.route('/api/journal/check', methods=['GET'])
+@journal_bp.route('/check', methods=['GET'])
 def check():
     return jsonify({"status": "ok"})
 
 
-@journal_bp.route('/api/journal', methods=['GET'])
+# thi includes a query parameter ?month=xyz&year=xyz
+@journal_bp.route('/entries', methods=['GET'])
 def get_journal():
     # Return all journal entries for a person
-
-    # Responses:
-    # Success, none
-    # Success, some
-    # Fail
+    month = request.args.get("month")
+    year = request.args.get("year")
     
-    return jsonify({"status": "success"})
+    # optional parameter for in depth views
+    day = request.args.get("day")
 
+    if not month or not year:
+        return jsonify({ "status" : "fail",
+                    "error": "Missing month or year",
+                    "statusCode" : 400})
 
-@journal_bp.route('/api/journal/today', methods=['POST'])
-def get_journal():
-    # Return only entries for today for teh user, 
-
-    # Responses:
-    # Success
-    # Fail
+    #TODO - fix sql quer, need try and except with error
+    db = get_db()
+    journal_entries = db.execute(
+        "SELECT * FROM logs WHERE strftime('%m', timestamp) = ? AND strftime('%Y', timestamp) = ?",
+        (month.zfill(2), year)
+    ).fetchall()
     
-    return jsonify({"status": "success"})
+    
+    return jsonify({"status" : "success",
+                    "message" : "Journal entries retrieved",
+                    "statusCode" : 200,
+                    "data" : journal_entries})
 
 
-@journal_bp.route('/api/journal/addentry', methods=['POST'])
-def get_journal():
+# @journal_bp.route('/api/journaltoday', methods=['GET'])
+# def get_journal_today():
+#     # Return only entries for today for teh user, 
+
+#     # Responses:
+#     # Success
+#     # Fail
+#     journal_entries = []
+    
+#     if True:
+#         return jsonify({ "status" : "fail",
+#                     "message" : "Error adding entry",
+#                     "statusCode" : 400,
+#                     "data" : []})
+    
+#     return jsonify({"status" : "success",
+#                     "message" : "Journal entries retrieved",
+#                     "statusCode" : 200,
+#                     "data" : journal_entries})
+
+
+@journal_bp.route('/addentry', methods=['POST'])
+def add_journal():
     # Add new journal entry for a person, another db call
 
     # Responses:
     # Success
     # Fail
     
-    return jsonify({"status": "success"})
+    if True:
+        return jsonify({ "status" : "success",
+                        "message" : "Journal entry added successfully",
+                        "statusCode" : 200})
+    
+    
+    return jsonify({ "status" : "fail",
+                    "message" : "error adding entry",
+                    "statusCode" : 403 })
+
 
