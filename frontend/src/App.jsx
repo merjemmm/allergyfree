@@ -7,21 +7,24 @@ import SignupPage from "./pages/Signup"
 import JournalPage from "./pages/Journal"
 import RestaurantPage from './pages/Restaurants';
 import CalendarPage from './pages/Calendar';
+import User from './UserContext';
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/journal" element={<JournalPage />} />
-        <Route path="/login" element={<AuthPage />} />
-        <Route path="/signup" element={<SignupPage />} />
-        <Route path="/restaurants" element={<RestaurantPage />} />
-        <Route path="/calendar" element={<CalendarPage />} />
-        <Route path="/profile" element={<ProfilePage />} />
-
-      </Routes>
+    <User>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/journal" element={<JournalPage />} />
+          <Route path="/login" element={<AuthPage />} />
+          <Route path="/signup" element={<SignupPage />} />
+          <Route path="/restaurants" element={<RestaurantPage />} />
+          <Route path="/calendar" element={<CalendarPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+        </Routes>
     </BrowserRouter>
+    </User>
+    
   );
 }
 export default App;

@@ -1,50 +1,50 @@
-import { Link } from 'react-router-dom';
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from 'react-router';
+import User from '../UserContext';
+import { UserContext } from '../UserContext';
+import { useContext, useState } from 'react';
+import { fetchAPI } from '../util';
 import '../styles/styles.css'
+
 
 function LoginPage() {
 
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const navigate = useNavigate();
+  // right now we just validate username; 
+  // should do password as well, but this will be enough for now
+  const {setUsername} = useContext(UserContext);
+  const [error, setError] = useState('');
+  let navigate = useNavigate();
 
-  const handleLogin = (e, username, password) => {
-    // e.preventDefault();
-    console.log("USERNAME: ", username);
-    console.log("PASSWORD: ", password);
-    setError("");
-    console.log("Clicked button");
-    // send to Profile page by default upon login
-    navigate("/Profile", { replace: true });
+  const handleLogin = async (event) => {
+    event.preventDefault();
+    setError('');
+    console.log("Clicked login");
+    const username = event.target.username.value;
+    const password = event.target.password.value;
 
-    // try {
-    //   const response = await fetch("http://localhost:5000/api/login", {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //     body: JSON.stringify({ username, password }),
-    //   });
-
-    //   const data = await response.json();
-
-    //   if (response.ok) {
-    //     // "Login successful"
-
-    //     // chatgpt does some token stuff which makes sense but idk the logic behind it 
-    //     // so not including but TODO
-
-    //     navigate("/journal", { replace: true });
-    //   } else {
-    //     // "Invalid credentials"
-    //     setError(data.message || "Invalid credentials");
-    //   }
-    // } catch (error) {
-    //   console.error(err);
-    //   setError("Network error — try again");
-    // }
+    try {
+          let response = await fetchAPI("/api/accounts/login", {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({username, password}),
+            // note: this is required -- if I make a wrapper ensure this included
+            credentials: "include",
+          });
+          
+          if (response.ok) {
+            setUsername(username);
+            navigate("/profile", { replace: true });
+          }
+          await response.json()
+            .then(d => setError(d.error));
+            
+          // set username to null on invalid attempts
+          setUsername(null);
+      } catch (e) {
+        console.error(e);
+        setError(e.message);
+    }
   };
 
 	return (
@@ -58,14 +58,12 @@ function LoginPage() {
 					<img src="../static/Heart.png"></img>
 				</div>
 				<div id="login-form">
-					<form id="login">
+					<form id="login" method="post" onSubmit={handleLogin}>
 						<p>
 							<label htmlFor="username">Username</label>
 							<input
                 type="text"
                 id="username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
                 autoComplete='username'
                 required
               />
@@ -75,14 +73,14 @@ function LoginPage() {
 							<input
                 type="password"
                 id="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
                 autoComplete='current-password'
                 required
               />
 						</p>
-						<button type="submit" onClick={(e) => handleLogin(e, username, password)}>Login</button>
-						<input type="hidden" name="operation" value="login" />
+            {error && (
+            <p className="error">{error}</p>
+            )}
+            <button type="submit">Log In</button>
 					</form>
 					<p>Don't have an account? 
             <Link to="/signup">
