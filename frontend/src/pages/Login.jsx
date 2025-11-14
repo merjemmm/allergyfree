@@ -28,8 +28,6 @@ function LoginPage() {
               'Content-Type': 'application/json'
             },
             body: JSON.stringify({username, password}),
-            // note: this is required -- if I make a wrapper ensure this included
-            credentials: "include",
           });
           
           if (response.ok) {

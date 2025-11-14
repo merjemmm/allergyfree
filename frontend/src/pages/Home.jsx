@@ -7,8 +7,8 @@ import User from '../UserContext';
 import { fetchAPI } from '../util';
 
 function HomePage() {
-  // const username = useContext(UserContext);
-  // console.log("username on homepage:", username);
+  const username = useContext(UserContext);
+  console.log("username on homepage:", username);
   return (
     <>
 			<div id="sidebar">

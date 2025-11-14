@@ -39,6 +39,8 @@ def handle_login():
                         "message": "Invalid username or password", 
                         "statusCode": 403})
 
+    login_user(user, remember=True)
+
     return jsonify({"status": "success", 
                     "message": "Logged in successfully", 
                     "statusCode": 200})
@@ -54,7 +56,7 @@ def handle_create():
     data = request.get_json()  # get the JSON body
     username = data.get("username")
     password = data.get("password")
-    fullname = data.get("fullname")
+    fullname = data.get("name")
 
     if not username or not password or not fullname:
         return jsonify({"status": "fail", 
@@ -69,6 +71,9 @@ def handle_create():
 
     hashed_password = generate_password_hash(password)
     user = User(username=username, fullname=fullname, password=hashed_password)
+
+    login_user(user, remember=True)
+    
     db.session.add(user)
     db.session.commit()
 

@@ -28,6 +28,7 @@ function SignupPage() {
 
         if (response.ok) {
             console.log("Account registration successful");
+            setUsername(username);
             navigate("/login", { replace: true });
 
         } else {
@@ -55,7 +56,7 @@ function SignupPage() {
                 <label htmlFor="name">Name</label>
                 <input
                     type="text"
-                    id="fullname"
+                    id="name"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     autoComplete='name'

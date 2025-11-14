@@ -25,13 +25,10 @@ function Profile() {
                 headers: {
                 'Content-Type': 'application/json'
                 },
-                credentials: "include",
             });
             
             if (response.ok) {
-                console.log("pre reset:", username);
                 setUsername(null);
-                console.log("post reset:", username);
                 navigate("/", { replace: true });
             }
             await response.json()
