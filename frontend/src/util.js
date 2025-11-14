@@ -6,7 +6,7 @@ async function fetchAPI(url, options) {
     return fetch(`${API_BASE_URL}${url}`, {
         ...options,
         // allow cookies wherever if in dev mode, only send to same-origin in prod
-        credentials: 'include'
+        credentials: 'include',
     })
 }
 

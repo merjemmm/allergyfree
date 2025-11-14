@@ -1,5 +1,5 @@
 """allergyfree backend accounts view and methods."""
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, make_response, session
 from backend.models import User
 from backend import db
 from flask_login import login_user, logout_user, login_required, current_user
@@ -13,7 +13,12 @@ auth_bp = Blueprint("auth", __name__)
 @auth_bp.route('/check', methods=["GET"])
 @login_required
 def check():
-    return jsonify({"username": current_user.username}), 200
+    resp = jsonify(username=current_user.username)
+    # --- never cache this endpoint ---
+    resp.headers["Cache-Control"] = "no-store, must-revalidate"
+    resp.headers["Pragma"] = "no-cache"
+    resp.headers["Expires"] = "0"
+    return resp, 200
 
 
 # curl -X POST http://127.0.0.1:5000/api/accounts/login \
@@ -82,14 +87,29 @@ def handle_create():
                     "statusCode": 200})
 
 
-# note: still need to implement this in profile
 @auth_bp.route('/logout', methods=["POST"])
 @login_required
 def handle_logout():
     logout_user()
-    return jsonify({"status": "success", 
-                    "message": "Logged out successfully", 
-                    "statusCode": 200})
+    # the below should all be part of ensuring username isn't cached
+    session.pop('_user_id', None)   # just to be sure
+    session.modified = True
+    session.clear()
+    resp = make_response(jsonify(
+        {"status": "success"}), 200)
+    # 3. kill the "remember me" cookie immediately
+    resp.set_cookie('remember_token', '', 
+                    expires=0, 
+                    httponly=True, 
+                    path='/',
+                    domain=None,              # match whatever we set in config
+                    secure=True,              # True because we use HTTPS for BE
+                    samesite='None')
+    # tell flask-login to forget immediately
+    session['_remember'] = 'clear'
+    session.modified = True
+    print(resp)
+    return resp
 
 
 
