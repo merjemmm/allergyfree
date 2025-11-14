@@ -3,6 +3,7 @@ import User from '../UserContext';
 import { UserContext } from '../UserContext';
 import { useContext, useState } from 'react';
 import { fetchAPI } from '../util';
+import Heart from '../static/Heart.png';
 import '../styles/styles.css'
 
 
@@ -56,7 +57,7 @@ function LoginPage() {
 			<div id="login-content">
 				<div id="slogan">
 					<h2>Find the food that loves you back.</h2>
-					<img src="../static/Heart.png"></img>
+					<img src={Heart}></img>
 				</div>
 				<div id="login-form">
 					<form id="login" method="post" onSubmit={handleLogin}>

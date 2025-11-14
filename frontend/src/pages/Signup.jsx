@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { fetchAPI } from '../util'
-import '../styles/styles.css'
+import { fetchAPI } from '../util';
+import Heart from '../static/Heart.png';
+import '../styles/styles.css';
+
 
 function SignupPage() {
     const [name, setName] = useState('');
@@ -48,7 +50,7 @@ function SignupPage() {
         <div id="login-content">
             <div id="slogan">
             <h2>Wellness starts with awareness.</h2>
-            <img src="../static/Heart.png"></img>
+            <img src={Heart}></img>
             </div>
             <div id="login-form">
             <form id="login">
