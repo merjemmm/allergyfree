@@ -3,14 +3,17 @@ from flask import Blueprint, jsonify, request
 from flask_login import current_user, login_required
 from backend.models import Symptom
 from datetime import datetime
+from sqlalchemy import extract
 
 calendar_bp = Blueprint("calendar", __name__)
 
-@calendar_bp.route('/all')
+
+@calendar_bp.route('/entries')
 @login_required
 def get_entries():
 
     # Get month, year, day from query params
+    # we allow day and year to not be given but month MUST be given
     day = request.args.get("day", default=None, type=int)
     month = request.args.get("month", default=None, type=int)
     year = request.args.get("year", default=None, type=int)
@@ -23,14 +26,19 @@ def get_entries():
     if not year:
         year = datetime.now().year
 
-    # Use current_user if user is logged in
-    if hasattr(current_user, 'username'):
-        username = current_user.username
+    query = Symptom.query.filter(
+        extract('year', Symptom.date) == year,
+        extract('month', Symptom.date) == month,
+        adder=current_user.username)
+
     
-    # query
-    query = Symptom.query.filter_by(adder=username, year=year, month=month)
     if day:
-        query = query.filter_by(day=day)
+        query = Symptom.query.filter(
+            extract('year', Symptom.date) == year,
+            extract('month', Symptom.date) == month,
+            extract('day', Symptom.date) == day,
+            adder=current_user.username)
+        
     calendar_entries = query.all()
 
     # convert to dicts for JSON response
@@ -41,14 +49,10 @@ def get_entries():
             "symptom": sym.symptom,
             "type": sym.type
         }
-    entries_json = [symptom_to_dict(s) for s in calendar_entries]
-    
-
-    # TODO - format the outries
 
     return jsonify({
         "status": "success",
         "message": "Calendar entries retrieved",
         "statusCode": 200,
-        "data": entries_json
+        "data": [symptom_to_dict(s) for s in calendar_entries]
     })

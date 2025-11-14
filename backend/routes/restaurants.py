@@ -32,6 +32,8 @@ def add_restaurant():
     data = request.get_json()
     name = data.get("name")
     location = data.get("location")
+    food = data.get("food")
+    notes = data.get("notes")
     goodexp = data.get("goodExp", False)
     created_time = datetime.now()
 

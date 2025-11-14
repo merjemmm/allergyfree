@@ -27,6 +27,8 @@ def add_account_symptom():
                         "error": "Missing required fields", 
                         "statusCode": 400})
 
+    # TODO - date from frontend or use datetime.now() instead
+    
     try:
         date = datetime.strptime(date_str, '%Y-%m-%d').date()
     except Exception:
