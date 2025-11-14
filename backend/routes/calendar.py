@@ -1,7 +1,7 @@
 """allergyfree backend for calendar page"""
-import flask
-from backend.model import get_db
 from flask import Blueprint, jsonify, request
+from flask_login import current_user, login_required
+from backend.models import Symptom
 from datetime import datetime
 
 calendar_bp = Blueprint("calendar", __name__)
@@ -11,79 +11,49 @@ calendar_bp = Blueprint("calendar", __name__)
 def check():
     return jsonify({"status": "ok"})
 
-# curl -X GET http://127.0.0.1:5000/api/calendar/entries?month=10&year=2025 
-# , methods=['GET']
-
 @calendar_bp.route('/entries')
+@login_required
 def get_entries():
-    # Return all entries for month, 
-    # username = session["username"]
-    
-    username = 'baseuser'
-    
+
+    # Get month, year, day from query params
     day = request.args.get("day", default=None, type=int)
     month = request.args.get("month", default=None, type=int)
     year = request.args.get("year", default=None, type=int)
     
     if not month:
-        return jsonify({ "status" : "error",
-                        "error" : "month query is empty",
-                        "statusCode" : 403})
-        
-    calendar_entries = []
-    conn = get_db()
+        return jsonify({ "status": "error", 
+                        "error": "month query is empty", 
+                        "statusCode": 403})
         
     if not year:
-        # we will default the year to the current year
         year = datetime.now().year
+
+    # Use current_user if user is logged in
+    if hasattr(current_user, 'username'):
+        username = current_user.username
     
-    # TODO = might be able to change storing of date to make it more efficient
-    # if we use datetime and extract day, month, year
-    if not day: 
-        calendar_entries = conn.execute(
-            """
-            SELECT *
-            FROM symptoms
-            WHERE adder = ? AND year = ? AND month = ?
-            """,
-            (username, year, month, )
-        ).fetchall()
-        
-    else:
-        # specific day   
-        calendar_entries = conn.execute(
-            """
-            SELECT *
-            FROM symptoms
-            WHERE adder = ? AND year = ? AND month = ? AND day = ?
-            """,
-            (username, year, month, day, )
-        ).fetchall()
-        
-        
+    # query
+    query = Symptom.query.filter_by(adder=username, year=year, month=month)
+    if day:
+        query = query.filter_by(day=day)
+    calendar_entries = query.all()
+
+    # convert to dicts for JSON response
+    def symptom_to_dict(sym):
+        return {
+            "id": sym.id,
+            "user": sym.user,
+            "symptom": sym.symptom,
+            "type": sym.type
+        }
+    entries_json = [symptom_to_dict(s) for s in calendar_entries]
+    
+
     # TODO - format the outries
-    
-    return jsonify({ "status" : "success",
-                    "message" : "Calendar entries retrieved",
-                    "statusCode" : 200,
-                    "data" : calendar_entries})
-    
 
-# def get_journal_today():
-#     # Return all entries for today day only
-#     # datetime.utcnow()
-    
-#     calendar_today = []
-
-#     if True:
-#         return jsonify({ "status" : "fail",
-#                         "Message" : "error retrieving calendar entries",
-#                         "Status code" : 403,
-#                         "Data" : [] })
-    
-#     return jsonify({ "status" : "success",
-#                     "Message" :  "Calendar entries for today retrieved",
-#                     "Status code" : 200,
-#                     "Data" : calendar_today})
-
-
+    return jsonify({
+        "status": "success",
+        "message": "Calendar entries retrieved",
+        "statusCode": 200,
+        "data": entries_json
+    })

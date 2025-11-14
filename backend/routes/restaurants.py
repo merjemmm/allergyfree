@@ -1,95 +1,59 @@
-# backend/routes/restaurants.py
 from flask import Blueprint, jsonify, request
-from backend.model import get_db
+from flask_login import current_user, login_required
+from backend.models import Restaurant
+from backend import db
+from datetime import datetime
 
 restaurants_bp = Blueprint('restaurants', __name__)
 
-# TODO - probably should also have optional query params
 @restaurants_bp.route('/all', methods=['GET'])
+@login_required
 def get_restaurants():
-    """
-    Display restaurants currently in the database for this user
-    """
+    # return all restaurants added by curr user
+    restaurants = Restaurant.query.filter_by(adder=current_user.username).all()
 
-    # Connect to database
-    # username = session["username"]
-    username = "baseuser"
-    connection = get_db()
+    def restaurant_to_dict(r):
+        return {
+            "restid": r.restid,
+            "name": r.name,
+            "location": r.location,
+            "goodexp": r.goodexp,
+            "created": r.created.isoformat() if r.created else None,
+        }
 
-    cur = connection.execute(
-        """
-        SELECT *
-        FROM restaurants
-        WHERE adder = ?
-        """,
-        (username, )
-    )
-
-    restaurants = cur.fetchall()
-
-    return jsonify({"status": "success", "restaurant": restaurants})
-
-
-# curl -X POST http://127.0.0.1:5000/api/restaurant/add \
-#       -H 'Content-Type: application/json' \
-#         -d '{"name" : "Burger 1", "location" : "Plymouth Rd", "goodexp" : true}'
+    return jsonify({
+        "status": "success",
+        "restaurants": [restaurant_to_dict(x) for x in restaurants]
+    })
 
 @restaurants_bp.route("/add", methods=["POST"])
+@login_required
 def add_restaurant():
-    # Add a restaurants to the db for a user, 
-    username = "baseuser"
-
-    data = request.get_json()  # get the JSON body
+    data = request.get_json()
     name = data.get("name")
     location = data.get("location")
-    goodexp = "TRUE" if data.get("goodExp") == "true" else "FALSE"
-    
-    if (
-        not name
-        or not location
-        or not goodexp
-    ):
-        return jsonify({"status" : "fail",
-                        "message" : "Missing name, location, or good experience",
-                        "statusCode" : 400 })
+    goodexp = data.get("goodExp", False)
+    created_time = datetime.now()
 
-    conn = get_db()
-    exis_rest = conn.execute(
-        """
-        SELECT 1
-        FROM restaurants
-        WHERE name = ? AND location = ?
-        """,
-        (name, location)
-    ).fetchone()
+    # accepts bool or 'true'/'false' strings for good experience
+    if isinstance(goodexp, str):
+        goodexp = goodexp.lower() == "true"
 
-    if exis_rest:
-        return jsonify({"status" : "fail",
-                        "message" : "Restaurant already exists for this user",
-                        "statusCode" : 409 })
+    if not name or not location:
+        return jsonify({"status": "fail", 
+                        "message": "Missing name or location", 
+                        "statusCode": 400})
 
-    # created the hash automatically instead of before with manual calc
+    restaurant = Restaurant(
+        name=name,
+        location=location,
+        adder=current_user.username,
+        goodexp=bool(goodexp),
+        created=created_time
+    )
+    db.session.add(restaurant)
+    db.session.commit()
 
-    try:
-        conn.execute(
-            "INSERT INTO restaurants (location, name, adder, goodexp) VALUES (?, ?, ?, ?)",
-            (location, name, username, goodexp),
-        )
-        conn.commit()
-    except sqlite3.IntegrityError:
-        conn.close()
-        # same as above, so keep one
-        return jsonify({"status" : "fail",
-                        "message" : "Restaurant already exists",
-                        "statusCode" : 409 })
-
-    conn.close()
-    return jsonify({"status" : "success",
-                    "message" : "Restaurant added successfully",
-                    "statusCode" : 200 })
-    
-    # if True:
-    #     return jsonify({ "status" : "fail",
-    #                     "error" : "error in adding",
-    #                     "statusCode" : 403 })
-
+    return jsonify({"status": "success", 
+                    "message": "Restaurant added successfully", 
+                    "statusCode": 200})

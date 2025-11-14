@@ -1,8 +1,8 @@
 PRAGMA foreign_keys = ON;
 
-INSERT INTO users(username, fullname, email, password)
+INSERT INTO users(username, fullname, password)
 VALUES 
-    ('baseuser', 'Base User', 'baseusero@umich.edu', 'pass'
+    ('baseuser', 'Base User', 'pass'
     );
 
 -- + sqlite3 -batch -line var/insta485.sqlite3 'SELECT * FROM posts'
@@ -14,11 +14,11 @@ VALUES
 INSERT INTO symptomCategories(symptom, type)
 VALUES ('migraine', 'brain');
 
-INSERT INTO symptoms(adder, day, month, year, type, notes, symptom)
+INSERT INTO symptoms(adder, date, type, notes, symptom)
 VALUES
-    ('baseuser', 1, 10, 2025, 'brain', 'bad pain', 'migraine'),
-    ('baseuser', 2, 10, 2025, 'brain', 'bad pain', 'migraine'),
-    ('baseuser', 3, 10, 2025, 'brain', 'bad pain', 'migraine');
+    ('baseuser', CURRENT_TIMESTAMP, 'brain', 'bad pain', 'migraine'),
+    ('baseuser', CURRENT_TIMESTAMP, 'brain', 'bad pain', 'migraine'),
+    ('baseuser', CURRENT_TIMESTAMP, 'brain', 'bad pain', 'migraine');
 
 
 -- INSERT INTO journal(location, name, adder)
