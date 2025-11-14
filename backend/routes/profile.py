@@ -124,7 +124,7 @@ def update_username():
     
 @profile_bp.route('/edit/fullname', methods=["POST"])
 @login_required
-def update_password():
+def update_fullname():
     
     data = request.get_json()
 

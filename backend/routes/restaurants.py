@@ -61,7 +61,7 @@ def add_restaurant():
 
 @restaurants_bp.route("/delete/<int:rest_id>/", methods=["DELETE"])
 @login_required
-def add_restaurant(rest_id):
+def delete_restaurant(rest_id):
     if not rest_id:
         return jsonify({"status": "fail", 
                         "message": "Missing restaurant id", 
@@ -73,7 +73,7 @@ def add_restaurant(rest_id):
                         "message": "Restaurant does not exist", 
                         "statusCode": 400})
         
-    db.session.delete(entry)
+    db.session.delete(restaurant)
     db.session.commit()
 
     return jsonify({"status": "success", 
