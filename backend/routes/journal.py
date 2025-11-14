@@ -43,7 +43,7 @@ def get_journal():
         "data": [journal_to_dict(e) for e in entries]
     })
 
-@journal_bp.route('/addentry', methods=['POST'])
+@journal_bp.route('/add', methods=['POST'])
 @login_required
 def add_journal():
     data = request.get_json()

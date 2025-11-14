@@ -112,7 +112,6 @@ def handle_logout():
     return resp
 
 
-
 @auth_bp.route('/delete', methods=["DELETE"])
 def handle_delete():
     """Display /accounts/delete/ route."""
