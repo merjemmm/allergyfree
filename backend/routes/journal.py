@@ -6,10 +6,6 @@ from datetime import datetime
 
 journal_bp = Blueprint("journal", __name__)
 
-@journal_bp.route('/check', methods=['GET'])
-def check():
-    return jsonify({"status": "ok"})
-
 @journal_bp.route('/entries', methods=['GET'])
 @login_required
 def get_journal():

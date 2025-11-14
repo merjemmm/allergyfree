@@ -1,10 +1,14 @@
-import React, { useState } from "react";
+import React, { useContext } from "react";
 import { Link } from 'react-router-dom';
 import "../styles/styles.css";
-import Heart from '../static/Heart.png'
+import Heart from '../static/Heart.png';
+import { UserContext } from '../UserContext';
+import User from '../UserContext';
+import { fetchAPI } from '../util';
 
 function HomePage() {
-
+  const username = useContext(UserContext);
+  console.log("username on homepage:", username);
   return (
     <>
 			<div id="sidebar">

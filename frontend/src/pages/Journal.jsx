@@ -1,13 +1,39 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import Select from 'react-select';
 import Navbar from "../components/NavBar"
 import '../styles/styles.css'
 
+
+// TODO: fetch symptoms from database
+const options = [
+    {value: "Headache", label: "Headache"},
+    {value: "Nausea", label: "Nausea"},
+    {value: "Joint Pain", label: "Joint Pain"},
+]
+
+function UserSymptoms() {
+    const [symptoms, setSymptoms] = useState([]);
+
+    const handleChange = (symptoms) => {
+        setSymptoms(symptoms || []);
+    };
+    return (
+    <>
+    <label>Symptoms (select all that apply)</label>
+    <form>
+        <Select
+            options={options}
+            onChange={handleChange}
+            value={symptoms}
+            isMulti
+        />
+    </form>
+    </>
+    )
+}
+
 function JournalPage() {
-    
-
-
-
     return (
         <>
         <Navbar />
@@ -34,18 +60,7 @@ function JournalPage() {
             <label>Notes</label>
             <textarea placeholder="Add any notes..."></textarea>
 
-            <label>Symptoms (select all that apply)</label>
-            <div className="symptom-list">
-                <button className="symptom">Headache</button>
-                <button className="symptom">Nausea</button>
-                <button className="symptom">Stomach Pain</button>
-                <button className="symptom">Joint Pain</button>
-                <button className="symptom">Vomiting</button>
-                <button className="symptom">Hives/Rash</button>
-                <button className="symptom">Bloating</button>
-                <button className="symptom">Swelling</button>
-                <button className="symptom">Dizziness</button>
-            </div>
+            <UserSymptoms></UserSymptoms>
 
             <button className="save-btn">Save Entry</button>
             </div>

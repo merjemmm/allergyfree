@@ -30,7 +30,6 @@ print(app.config["SQLALCHEMY_DATABASE_URI"])
 # --- init db and login ---
 db.init_app(app)
 login_manager.init_app(app)
-login_manager.login_view = 'auth.handle_login'
 
 # --- register blueprints ---
 

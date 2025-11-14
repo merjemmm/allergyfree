@@ -10,11 +10,6 @@ from datetime import datetime
 
 profile_bp = Blueprint("profile", __name__)
 
-@profile_bp.route('/check', methods=['GET'])
-def check():
-    return jsonify({"status": "ok"})
-
-
 # add new symptom to symptom table
 @profile_bp.route('/addsymptom', methods=['POST'])
 @login_required
