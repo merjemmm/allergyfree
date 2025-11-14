@@ -1,10 +1,15 @@
-import { useState, useEffect } from "react";
+import { useContext, useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import Navbar from "../components/NavBar"
-import '../styles/styles.css'
+import User from '../UserContext';
+import { fetchAPI } from '../util';
+import { UserContext } from '../UserContext';
+import Navbar from "../components/NavBar";
+import '../styles/styles.css';
 
 
-function RestaurantPage(){
+function Restaurant(){
+
+    const {username, setUsername} = useContext(UserContext);
     // ADDED CODE
 
     // 'restaurants' holds current data, an array of entries
@@ -206,6 +211,20 @@ function RestaurantPage(){
 
 
 
+}
+
+function RestaurantPage() {
+    const {username, setUsername} = useContext(UserContext);
+    return (
+        <>
+        {(username !== null) ? <Restaurant/> : 
+        <div>
+            <p> Go log in first!</p>
+            <Link to='/login'> Log in</Link>
+        </div>
+        }
+        </>
+    )
 }
 
 export default RestaurantPage;

@@ -1,8 +1,11 @@
-import { useState, useEffect } from "react";
+import { useContext, useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import Select from 'react-select';
-import Navbar from "../components/NavBar"
-import '../styles/styles.css'
+import User from '../UserContext';
+import { fetchAPI } from '../util';
+import { UserContext } from '../UserContext';
+import Navbar from "../components/NavBar";
+import '../styles/styles.css';
 
 
 // TODO: fetch symptoms from database
@@ -33,7 +36,7 @@ function UserSymptoms() {
     )
 }
 
-function JournalPage() {
+function Journal() {
     return (
         <>
         <Navbar />
@@ -92,6 +95,20 @@ function JournalPage() {
             </div>
             </div>
         </div>
+        </>
+    )
+}
+
+function JournalPage() {
+    const {username, setUsername} = useContext(UserContext);
+    return (
+        <>
+        {(username !== null) ? <Journal/> : 
+        <div>
+            <p> Go log in first!</p>
+            <Link to='/login'> Log in</Link>
+        </div>
+        }
         </>
     )
 }
