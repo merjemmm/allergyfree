@@ -36,11 +36,14 @@ function LoginPage() {
             setUsername(username);
             navigate("/profile", { replace: true });
           }
+          else {
+            // set username to null on invalid attempts
+            setUsername(null);
+          }
           await response.json()
             .then(d => setError(d.error));
             
-          // set username to null on invalid attempts
-          setUsername(null);
+          
       } catch (e) {
         console.error(e);
         setError(e.message);

@@ -36,7 +36,6 @@ function SignupPage() {
         }
         } catch (err) {
         console.error(err);
-        setError("Network error — try again");
         }
     };
 

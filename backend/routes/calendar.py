@@ -6,11 +6,6 @@ from datetime import datetime
 
 calendar_bp = Blueprint("calendar", __name__)
 
-
-@calendar_bp.route('/check', methods=['GET'])
-def check():
-    return jsonify({"status": "ok"})
-
 @calendar_bp.route('/entries')
 @login_required
 def get_entries():

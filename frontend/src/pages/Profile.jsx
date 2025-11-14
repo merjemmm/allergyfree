@@ -9,6 +9,7 @@ import '../styles/styles.css'
 function Profile() {
 
     const {username, setUsername} = useContext(UserContext);
+    console.log("username pre signout:", username);
 
     let navigate = useNavigate();
     const [error, setError] = useState('');
@@ -174,7 +175,8 @@ function Profile() {
 
 function ProfilePage() {
     const {username, setUsername} = useContext(UserContext);
-    console.log("username opening Profile Page:", username);
+    console.log("username pre signout PFP:", username);
+    // console.log("username opening Profile Page:", username);
     return (
         <>
         {(username !== null) ? <Profile/> : 
