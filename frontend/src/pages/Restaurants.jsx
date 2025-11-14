@@ -11,7 +11,7 @@ function RestaurantPage(){
     // 'setRestaurants' is a function that updates the data
     const [restaurants, setRestaurants] = useState([]);
 
-    // this is what we'll track for each entry
+    // THIS IS WHAT WE'RE TRACKING FOR EACH ENTRY
     const [formData, setFormData] = useState({
         name: "",
         location: "",
@@ -19,6 +19,13 @@ function RestaurantPage(){
         notes: "",
         good_experience: true,
     });
+
+    // trAcking whichs entry is expanded
+    const [expandedIdx, setExpandedIdx] = useState(null);
+
+    // adding state for selected items (so they can delete multiple entries later on)
+    const [selected, setSelected] = useState([]);
+
 
     // this will handle inputs for name, location, food, and notes
     const handleChange = (e) => {
@@ -121,11 +128,49 @@ function RestaurantPage(){
                 <ul className="restaurant-list">
                     {restaurants.length == 0 && <li>No entries yet.</li>}
                     {restaurants.map((r,i) => (
-                        <li key={i}>
-                            {r.name}
-                            <span className={`small ${r.good_experience ? "thumb-up" : "thumb-down"}`}>
-                                {r.good_experience ? "👍" : "👎"}
-                            </span>
+                        <li 
+                            key={i}
+                            className = {`restaurant-item ${expandedIdx==i ? "expanded" : ""}`}
+                            onClick={() => setExpandedIdx(prev => (prev==i ? null : i))}
+                        >
+                            {/*this is the always visible preview part (namme + rating) */}
+                            <div className="restaurant-summary">
+                                {/*this is the LEFT side of the entry preview...just name */}
+                                <span className="restaurant-name">{r.name}</span>
+
+                                {/*this is the RIGHT side of the preview, has rating+checkbox */}
+                                <div className = "summary-right">
+                                    <span className={`small ${r.good_experience ? "thumb-up" : "thumb-down"}`}>
+                                        {r.good_experience ? "👍" : "👎"}
+                                    </span>
+                                    {/*checkboxes for the user to select multiple and delete */}
+                                    <input 
+                                        type="checkbox" 
+                                        className="entry-checkbox"
+                                        checked={selected.includes(i)}
+                                        onClick={(e) => e.stopPropagation()}  // prevent expand
+                                        onChange={() => {
+                                            if (selected.includes(i)) {
+                                                setSelected(selected.filter(id => id !== i));
+                                            } else {
+                                                setSelected([...selected, i]);
+                                            }
+                                        }}
+                                    />
+                                
+                                </div>
+                                
+                            </div>
+                            
+
+                            {/*details which are only visible when expanded */}
+                            {expandedIdx==i && (
+                                <div className="restaurant-details">
+                                    {r.location && (<p><b>Location:</b> {r.location}</p>)}
+                                    {r.food && (<p><b>What you ordered:</b> {r.food}</p>)}
+                                    {r.notes && (<p><b>Notes:</b> {r.notes}</p>)}
+                                </div>
+                            )}
                         </li>
                     ))}
 
@@ -133,14 +178,27 @@ function RestaurantPage(){
                     <li>Domino’s Pizza <span className="thumb-down small">👎</span></li>
                     <li className="highlighted">Madras Masala <span className="thumb-down small">👎</span></li>*/}
                 </ul>
-                {/*TODO: add the delete btn functionality */}
-                {/*TODO: allow users to 'expand' an entry to view details */}
+
+
+                {/* delete btn functionality */}
+                <button 
+                    className="delete-btn"
+                    onClick={() => {
+                        setRestaurants(restaurants.filter((_, i) => !selected.includes(i)));
+                        setSelected([]); // reset
+                    }}
+                >
+                    Delete All Selected
+                </button>
+
+                {/*
                 <div className="multi-select">
                     <select>
                     <option>Select Multiple</option>
                     </select>
                     <button className="delete-btn">Delete</button>
                 </div>
+                */}
             </section>
         </main>
         </>
