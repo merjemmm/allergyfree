@@ -329,6 +329,53 @@ textarea {
 
 /*TODO make the placeholders a bit lighter in color*/
 
+/*added style for expanding*/
+/* Each restaurant item block */
+.restaurant-item {
+    padding: 10px 12px;
+    border-bottom: 1px solid #ddd;
+    cursor: pointer;
+}
+
+/* Header: name + rating */
+.restaurant-summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.summary-right {
+  display:flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.entry-checkbox {
+  margin: 0;
+  cursor: pointer;
+}
+
+/* Expanded block */
+.restaurant-details {
+    margin-top: 8px;
+    line-height: 1.4;
+    font-size: 0.95rem;
+}
+
+/* Make each line neat */
+.restaurant-details p {
+    margin: 4px 0;
+}
+
+/* Subtle highlight when open */
+.restaurant-item.expanded {
+    background-color: #f7f7f1;
+    border-radius: 6px;
+}
+
+/*end of expandibng style*/
 .feedback-icons {
   display: flex;
   justify-content: center;
@@ -373,15 +420,14 @@ textarea {
 }
 
 .restaurant-list li {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   background: #fffefb;
   border: 1px solid #eee;
   border-radius: 6px;
   padding: 0.6rem 1rem;
   margin-bottom: 0.5rem;
+  display: block;        /* important */
 }
+
 
 .restaurant-list li.highlighted {
   border: 2px solid #9b6ef3;
