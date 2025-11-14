@@ -13,6 +13,7 @@ class User(UserMixin, db.Model):
     def get_id(self):
         return str(self.id)
 
+# this is for tracking restaurant experiences
 class Restaurant(db.Model):
     __tablename__ = 'restaurants'
     restid = db.Column(db.Integer, primary_key=True)
@@ -23,6 +24,7 @@ class Restaurant(db.Model):
     goodexp = db.Column(db.Boolean)
     created = db.Column(db.DateTime)
 
+# this is for tracking symptoms had
 class Symptom(db.Model):
     __tablename__ = 'symptoms'
     id = db.Column(db.Integer, primary_key=True)
@@ -44,6 +46,7 @@ class SymptomCategory(db.Model):
     symptom = db.Column(db.String(20))
     type = db.Column(db.String(64))
 
+# this is for tracking food eaten
 class Journal(db.Model):
     __tablename__ = 'journal'
     id = db.Column(db.Integer, primary_key=True)

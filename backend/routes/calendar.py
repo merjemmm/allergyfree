@@ -6,7 +6,7 @@ from datetime import datetime
 
 calendar_bp = Blueprint("calendar", __name__)
 
-@calendar_bp.route('/entries')
+@calendar_bp.route('/all')
 @login_required
 def get_entries():
 
