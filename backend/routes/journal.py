@@ -1,82 +1,76 @@
-"""allergyfree backend for journal page"""
-import flask
-from backend.model import get_db
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
+from flask_login import current_user, login_required
+from backend.models import Journal
+from backend import db
+from datetime import datetime
 
 journal_bp = Blueprint("journal", __name__)
-
 
 @journal_bp.route('/check', methods=['GET'])
 def check():
     return jsonify({"status": "ok"})
 
-
-# thi includes a query parameter ?month=xyz&year=xyz
 @journal_bp.route('/entries', methods=['GET'])
+@login_required
 def get_journal():
-    # Return all journal entries for a person
-    month = request.args.get("month")
-    year = request.args.get("year")
-    
-    # optional parameter for in depth views
-    day = request.args.get("day")
+
+    month = request.args.get("month", type=int)
+    year = request.args.get("year", type=int)
+    day = request.args.get("day", type=int)
 
     if not month or not year:
-        return jsonify({ "status" : "fail",
-                    "error": "Missing month or year",
-                    "statusCode" : 400})
+        return jsonify({ "status": "fail", 
+                        "error": "Missing month or year", 
+                        "statusCode": 400})
 
-    #TODO - fix sql quer, need try and except with error
-    db = get_db()
-    journal_entries = db.execute(
-        "SELECT * FROM logs WHERE strftime('%m', timestamp) = ? AND strftime('%Y', timestamp) = ?",
-        (month.zfill(2), year)
-    ).fetchall()
-    
-    
-    return jsonify({"status" : "success",
-                    "message" : "Journal entries retrieved",
-                    "statusCode" : 200,
-                    "data" : journal_entries})
+    # filtering by username, month, year, optionally day rn
+    query = Journal.query.filter_by(adder=current_user.username)
+    query = query.filter(db.extract('month', Journal.created) == month, db.extract('year', Journal.created) == year)
+    if day:
+        query = query.filter(db.extract('day', Journal.created) == day)
 
+    entries = query.all()
 
-# @journal_bp.route('/api/journaltoday', methods=['GET'])
-# def get_journal_today():
-#     # Return only entries for today for teh user, 
+    def journal_to_dict(entry):
+        return {
+            "id": entry.id,
+            "adder": entry.adder,
+            "created": entry.created.isoformat() if entry.created else None,
+            "meal": entry.meal,
+            "name": entry.name,
+        }
 
-#     # Responses:
-#     # Success
-#     # Fail
-#     journal_entries = []
-    
-#     if True:
-#         return jsonify({ "status" : "fail",
-#                     "message" : "Error adding entry",
-#                     "statusCode" : 400,
-#                     "data" : []})
-    
-#     return jsonify({"status" : "success",
-#                     "message" : "Journal entries retrieved",
-#                     "statusCode" : 200,
-#                     "data" : journal_entries})
-
+    return jsonify({
+        "status": "success",
+        "message": "Journal entries retrieved",
+        "statusCode": 200,
+        "data": [journal_to_dict(e) for e in entries]
+    })
 
 @journal_bp.route('/addentry', methods=['POST'])
+@login_required
 def add_journal():
-    # Add new journal entry for a person, another db call
+    data = request.get_json()
+    meal = data.get("meal")
+    name = data.get("name")
+    created_time = datetime.now()
 
-    # Responses:
-    # Success
-    # Fail
-    
-    if True:
-        return jsonify({ "status" : "success",
-                        "message" : "Journal entry added successfully",
-                        "statusCode" : 200})
-    
-    
-    return jsonify({ "status" : "fail",
-                    "message" : "error adding entry",
-                    "statusCode" : 403 })
+    if not meal or not name:
+        return jsonify({"status": "fail", 
+                        "message": "Missing meal or name", 
+                        "statusCode": 400})
 
+    journal_entry = Journal(
+        adder=current_user.username,
+        created=created_time,
+        meal=meal,
+        name=name
+    )
+    db.session.add(journal_entry)
+    db.session.commit()
 
+    return jsonify({
+        "status": "success",
+        "message": "Journal entry added successfully",
+        "statusCode": 200
+    })
