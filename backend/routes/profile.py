@@ -12,8 +12,8 @@ profile_bp = Blueprint("profile", __name__)
 
 # add new symptom to symptom table
 @profile_bp.route('/addsymptom', methods=['POST'])
+@login_required
 def add_account_symptom():
-
     data = request.get_json()
     adder = data.get('adder')
     category = data.get('category')
@@ -39,8 +39,8 @@ def add_account_symptom():
 
 # track occurrence of symptom in symptom logging table
 @profile_bp.route('/logsymptom', methods=['POST'])
+@login_required
 def update_symptom_log():
-
     data = request.get_json()
     adder = data.get('adder')
     category = data.get('category')
@@ -95,7 +95,6 @@ def add_account_category():
 @profile_bp.route('/edit/password', methods=["POST"])
 @login_required
 def update_password():
-
     data = request.get_json()
     
     old_password = data.get('password')
@@ -166,7 +165,6 @@ def update_username():
 @profile_bp.route('/edit/fullname', methods=["POST"])
 @login_required
 def update_fullname():
-    
     data = request.get_json()
 
     new_fullname = data.get("new_fullname")
