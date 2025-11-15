@@ -18,7 +18,7 @@ function Profile() {
     const fetchSymptomCategories = async () => {
         setError('');
         try {
-            const response = await fetchAPI("api/profile/symptomcategories", {
+            const response = await fetchAPI("/api/profile/symptomcategories", {
                 method: 'GET',
                 headers: {
                 'Content-Type': 'application/json'
@@ -37,8 +37,8 @@ function Profile() {
 
     // should run every time categories is updated
     useEffect(() => {
-        fetchSymptomCategories();
-    });
+     fetchSymptomCategories();
+    }, []);
 
     function CategoryList() {
         const CategoryList = categories?.map(category => <option>{category}</option>);
