@@ -26,20 +26,27 @@ class Restaurant(db.Model):
     goodexp = db.Column(db.Boolean)
     created = db.Column(db.DateTime)
 
-# this is for tracking symptoms had
+# this is for the symptoms a user wants to log
 class Symptom(db.Model):
     __tablename__ = 'symptoms'
     id = db.Column(db.Integer, primary_key=True)
     adder = db.Column(db.String(64), db.ForeignKey('users.username'))
     user = db.relationship('User')
+    category = db.Column(db.String(64))
+    symptom = db.Column(db.String(20))
+
+# this is for logging occurrences of the above ^ symptoms
+class SymptomLog(db.Model):
+    __tablename__ = 'symptomlog'
+    id = db.Column(db.Integer, primary_key=True)
+    adder = db.Column(db.String(64), db.ForeignKey('users.username'))
+    user = db.relationship('User')
     date = db.Column(db.DateTime)
-    # year = db.Column(db.Integer)
-    # month = db.Column(db.Integer)
-    # day = db.Column(db.Integer)
-    type = db.Column(db.String(64))
+    category = db.Column(db.String(64))
     notes = db.Column(db.String(200))
     symptom = db.Column(db.String(20))
 
+# this is for sorting Symptom by category (e.g. migraine => brain)
 class SymptomCategory(db.Model):
     __tablename__ = 'symptomCategories'
     id = db.Column(db.Integer, primary_key=True)

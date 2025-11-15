@@ -111,8 +111,8 @@ function Profile() {
         setError('');
         console.log("Clicked add symptom button");
 
-        // TODO collect other fields
-        const category = event.target.symptom.value;
+        const symptom = event.target.symptom.value;
+        const category = event.target.category.value;
 
         try {
             let response = await fetchAPI("/api/profile/addsymptom", {
@@ -120,8 +120,7 @@ function Profile() {
                 headers: {
                 'Content-Type': 'application/json'
                 },
-                // TODO collect other fields
-                body: JSON.stringify({username, category}),
+                body: JSON.stringify({username, symptom, category}),
             });
             
             if (response.ok) {

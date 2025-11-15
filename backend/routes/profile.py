@@ -1,6 +1,6 @@
 """allergyfree backend accounts view and methods."""
 import pathlib
-from backend.models import User, Symptom, SymptomCategory
+from backend.models import User, Symptom, SymptomCategory, SymptomLog
 from flask import Blueprint, jsonify, request
 from flask_login import current_user, login_required
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -15,33 +15,18 @@ profile_bp = Blueprint("profile", __name__)
 def add_account_symptom():
 
     data = request.get_json()
-    category = data.get('category')
     adder = data.get('adder')
-    type = data.get('type')
-    notes = data.get('notes')
+    category = data.get('category')
     symptom = data.get('symptom')
-    date_str = data.get('created')
 
-    if not all([adder, category, symptom, date_str, type]):
+    if not all([adder, category, symptom]):
         return jsonify({"status": "fail", 
                         "error": "Missing required fields", 
                         "statusCode": 400})
 
-    # TODO - date from frontend or use datetime.now() instead
-    
-    try:
-        date = datetime.strptime(date_str, '%Y-%m-%d').date()
-    except Exception:
-        return jsonify({"status": "fail", 
-                        "error": "Invalid date format", 
-                        "statusCode": 400})
-
     s = Symptom(adder=current_user.username,
                 category=category,
-                name=symptom,
-                type=type,
-                notes=notes,
-                date=date)
+                name=symptom)
     db.session.add(s)
     db.session.commit()
 
@@ -51,6 +36,36 @@ def add_account_symptom():
                     "data": [ {"symptom_category": s.symptom_category, 
                                "symptom_name": s.symptom_name, 
                                "date": s.date.isoformat()} ]})
+
+# track occurrence of symptom in symptom logging table
+@profile_bp.route('/logsymptom', methods=['POST'])
+def update_symptom_log():
+
+    data = request.get_json()
+    adder = data.get('adder')
+    category = data.get('category')
+    symptom = data.get('symptom')
+    date = data.get('date')
+    notes = data.get('notes')
+
+    if not all([adder, category, symptom, date]):
+        return jsonify({"status": "fail", 
+                        "error": "Missing required fields", 
+                        "statusCode": 400})
+
+    # TODO -- probably check format of date here
+
+    s = SymptomLog(adder=current_user.username,
+                category=category,
+                name=symptom,
+                notes=notes,
+                date=date)
+    db.session.add(s)
+    db.session.commit()
+
+    return jsonify({"status": "success",
+                    "message": "Symptom logged successfully",
+                    "statusCode": 200})
 
 # add new symptom category to symptomCategory table
 @profile_bp.route('/addcategory', methods=['POST'])
