@@ -9,11 +9,43 @@ import '../styles/styles.css'
 function Profile() {
 
     const {username, setUsername} = useContext(UserContext);
-    console.log("username pre signout:", username);
+    const [categories, setCategories] = useState(null);
 
     let navigate = useNavigate();
     const [error, setError] = useState('');
 
+    // function GETs all categories to return in profile dropdown
+    const fetchSymptomCategories = async () => {
+        setError('');
+        try {
+            const response = await fetchAPI("api/profile/symptomcategories", {
+                method: 'GET',
+                headers: {
+                'Content-Type': 'application/json'
+                },
+            });
+            const data = await response.json();
+            if (!response.ok) {
+                setError(data.error);
+            } else {
+                setCategories(data);
+            }
+        } catch (e) {
+            setError(e.message);
+        }
+    }
+
+    // should run every time categories is updated
+    useEffect(() => {
+        fetchSymptomCategories();
+    });
+
+    function CategoryList() {
+        const CategoryList = categories?.map(category => <option>{category}</option>);
+        return <select>{CategoryList}</select>;
+    }
+
+    // logs out user
     const handleSignout = async (event) => {
         event.preventDefault();
         setError('');
@@ -30,6 +62,70 @@ function Profile() {
             if (response.ok) {
                 setUsername(null);
                 navigate("/", { replace: true });
+            }
+            else {
+                await response.json()
+                .then(d => setError(d.error));
+            }
+        } catch (e) {
+            console.error(e);
+            setError(e.message);
+        }
+    };
+
+    // adds new symptom category to db (POST)
+    const handleAddCategory = async (event) => {
+        event.preventDefault();
+        setError('');
+        console.log("Clicked add category button");
+
+        const category = event.target.category.value;
+
+        try {
+            let response = await fetchAPI("/api/profile/addcategory", {
+                method: 'POST',
+                headers: {
+                'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({username, category}),
+            });
+            
+            if (response.ok) {
+                console.log("added category ", category);
+                console.log("categories:", categories);
+                // the below updates the symptom categories displayed on page
+                fetchSymptomCategories();
+                event.target.category.value = '';
+            }
+            await response.json()
+                .then(d => setError(d.error));
+        } catch (e) {
+            console.error(e);
+            setError(e.message);
+        }
+    };
+
+    // adds new symptom to db
+    const handleAddSymptom = async (event) => {
+        event.preventDefault();
+        setError('');
+        console.log("Clicked add symptom button");
+
+        // TODO collect other fields
+        const category = event.target.symptom.value;
+
+        try {
+            let response = await fetchAPI("/api/profile/addsymptom", {
+                method: 'POST',
+                headers: {
+                'Content-Type': 'application/json'
+                },
+                // TODO collect other fields
+                body: JSON.stringify({username, category}),
+            });
+            
+            if (response.ok) {
+                console.log("added symptom ", symptom);
             }
             await response.json()
                 .then(d => setError(d.error));
@@ -61,12 +157,14 @@ function Profile() {
                 </section>
 
                 <section className="card add-symptom-category">
-                <h2>Add New Symptom Category</h2>
-                <p className="muted">Input symptom categories for tracking</p>
-                <label className="label spaced">Symptom Category Name</label>
-                <input type="text" placeholder="e.g., Respiratory" />
-
-                <button className="add-btn">Add Category</button>
+                    <h2>Add New Symptom Category</h2>
+                    <form method="post" onSubmit={handleAddCategory}>
+                        <p className="muted">Input symptom categories for tracking</p>
+                        <label className="label spaced">Symptom Category Name</label>
+                        <input type="text" id = "category" placeholder="e.g., Respiratory" required/>
+                    <   button className="add-btn">Add Category</button>
+                    </form>
+                
                 </section>
 
                 <section className="card add-symptom">
@@ -74,12 +172,7 @@ function Profile() {
                 <p className="muted">Input your symptoms by category for tracking</p>
 
                 <label className="label">Category</label>
-                <select>
-                    <option>Mental / Cognitive</option>
-                    <option>Respiratory</option>
-                    <option>Dermatological</option>
-                    <option>GI / Intestinal</option>
-                </select>
+                <CategoryList/>
 
                 <label className="label spaced">Symptom Name</label>
                 <input type="text" placeholder="e.g., Migraine" />
@@ -172,8 +265,6 @@ function Profile() {
 
 function ProfilePage() {
     const {username, setUsername} = useContext(UserContext);
-    console.log("username pre signout PFP:", username);
-    // console.log("username opening Profile Page:", username);
     return (
         <>
         {(username !== null) ? <Profile/> : 

@@ -45,8 +45,7 @@ class SymptomCategory(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     adder = db.Column(db.String(64), db.ForeignKey('users.username'))
     user = db.relationship('User')
-    symptom = db.Column(db.String(20))
-    type = db.Column(db.String(64))
+    category = db.Column(db.String(64))
 
 # this is for tracking food eaten
 class Journal(db.Model):

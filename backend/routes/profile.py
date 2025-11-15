@@ -11,9 +11,22 @@ from datetime import datetime
 profile_bp = Blueprint("profile", __name__)
 
 # add new symptom to symptom table
-@profile_bp.route('/addsymptom', methods=['POST'])
-@login_required
+@profile_bp.route('/addsymptom', methods=['POST', 'OPTIONS'])
 def add_account_symptom():
+
+    # deal with options without auth
+    if request.method == 'OPTIONS':
+        # CORS should handle setting appropriate headers
+        response = jsonify({"message": "CORS preflight successful"})
+        response.status_code = 200
+        return response
+    
+    # This part is for the actual POST request and requires auth
+    if not current_user.is_authenticated:
+        return jsonify({"status": "fail",
+                        "error": "Authentication required",
+                        "statusCode": 401}), 401
+
     data = request.get_json()
     category = data.get('category')
     adder = data.get('adder')
@@ -51,6 +64,42 @@ def add_account_symptom():
                     "data": [ {"symptom_category": s.symptom_category, 
                                "symptom_name": s.symptom_name, 
                                "date": s.date.isoformat()} ]})
+
+# add new symptom category to symptomCategory table
+@profile_bp.route('/addcategory', methods=['POST', 'OPTIONS'])
+def add_account_category():
+    # deal with options without auth
+    if request.method == 'OPTIONS':
+        # CORS should handle setting appropriate headers
+        response = jsonify({"message": "CORS preflight successful"})
+        response.status_code = 200
+        return response
+    
+    # This part is for the actual POST request and requires auth
+    if not current_user.is_authenticated:
+        return jsonify({"status": "fail",
+                        "error": "Authentication required",
+                        "statusCode": 401}), 401
+
+    data = request.get_json()
+    category = data.get('category')
+    adder = data.get('username')
+
+    if not all([adder, category]):
+        return jsonify({"status": "fail", 
+                        "error": "Missing required fields", 
+                        "statusCode": 400})
+
+    c = SymptomCategory(adder=current_user.username,
+                category=category
+                )
+    db.session.add(c)
+    db.session.commit()
+
+    return jsonify({"status": "success",
+                    "message": "Category added successfully",
+                    "statusCode": 200,
+                    "data": [ {"category": c.category} ]})
 
 
 @profile_bp.route('/edit/password', methods=["POST"])
@@ -149,3 +198,28 @@ def update_fullname():
     return jsonify({"status": "success", 
                     "message": "Fullname updated successfully", 
                     "statusCode": 200})
+
+@profile_bp.route('/symptomcategories', methods=['GET', 'OPTIONS'])
+def get_categories():
+    # deal with options without auth... is this bad method
+    if request.method == 'OPTIONS':
+        # CORS should handle setting appropriate headers
+        response = jsonify({"message": "CORS preflight successful"})
+        response.status_code = 200
+        return response
+    
+    # This part is for the actual GET request and requires auth
+    if not current_user.is_authenticated:
+        return jsonify({"status": "fail",
+                        "error": "Authentication required",
+                        "statusCode": 401}), 401
+
+    rows = (db.session.query(SymptomCategory.category)
+                    .filter_by(adder=current_user.username)
+                    .distinct()
+                    .all())
+    print('rows:', rows)
+    categories = [r.category for r in rows]
+    print('categories:', rows)
+    return jsonify(categories), 200
+
