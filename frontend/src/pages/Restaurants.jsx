@@ -16,7 +16,7 @@ function Restaurant(){
     // 'setRestaurants' is a function that updates the data
     const [restaurants, setRestaurants] = useState([]);
 
-    // THIS IS WHAT WE'RE TRACKING FOR EACH ENTRY
+    // THIS IS WHAT WE'RE TRACKING FOR EACH ENTRY!!
     const [formData, setFormData] = useState({
         name: "",
         location: "",
@@ -31,6 +31,46 @@ function Restaurant(){
     // adding state for selected items (so they can delete multiple entries later on)
     const [selected, setSelected] = useState([]);
 
+    // HOUDA'S BACKEND ATTEMPT //
+    // load in restaurants from backend...
+    const loadRestaurants = async () => {
+        try{
+            const response = await fetchAPI("/api/restaurant/all", {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+
+            const data = await response.json(); // parse json
+
+            if(!response.ok) {
+                console.error("Failed to load restaurants:", data);
+                return;
+            }
+
+            if (data.status == "success") {
+                const mapped = data.restaurants.map((r) => ({
+                    id: r.restid,
+                    name: r.name,
+                    location: r.location,
+                    food: r.food || "",
+                    notes: r.notes || "",
+                    good_experience: r.goodexp,
+                }));
+                setRestaurants(mapped);
+            } else {
+                console.error("Failed to load restaurants:", data);
+            }
+        } catch (err) {
+            console.error("Error loading restaurants:", err);
+        }
+    };
+
+    // call loadRestaurants
+    useEffect(() => {
+        loadRestaurants();
+    }, []);
 
     // this will handle inputs for name, location, food, and notes
     const handleChange = (e) => {
@@ -43,12 +83,44 @@ function Restaurant(){
     };
 
     // this will be the 'save entry' part
-    const handleSubmit = (e) => {
+    // BACKEND UPDATE (?) SAVE ENTRY VIA BACKEND
+    const handleSubmit = async (e) => {
         e.preventDefault(); // prevents browser from refreshing on save entry
         if (!formData.name.trim()) return; // user cant save without restaurant name
-        setRestaurants([...restaurants, formData]); // adds the new entry to the state
-        // reset input fields now so the user can make a new entry
-        setFormData({name: "", location: "", food: "", notes: "", good_experience: true}); 
+
+        // UPDATED BACKEND PART HERE...
+        try {
+            const response = await fetchAPI("/api/restaurant/add", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    name: formData.name,
+                    location: formData.location,
+                    food: formData.food,
+                    notes: formData.notes,
+                    goodExp: formData.good_experience,
+                }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok || data.status != "success") {
+                console.error("Failed to add restaurant:", data);
+                return;
+            }
+
+            // refresh the list from backend so we get the new item 
+            await loadRestaurants();
+
+            // reset input fields now so the user can make a new entry
+            setFormData({name: "", location: "", food: "", notes: "", good_experience: true}); 
+        } catch (err) {
+            console.error("Error adding restaurant:", err);
+        }
+        //setRestaurants([...restaurants, formData]); // adds the new entry to the state
+        
     };
 
     // END OF ADDED CODE...
@@ -124,17 +196,16 @@ function Restaurant(){
             </section>
 
             <section className="entries-section card">
+                {/* adds the entry to the list*/}
+                <h2>Restaurant Entries</h2>
                 <div className="search-bar">
                     <input type="text" placeholder="🔍 Search" />
                 </div>
-
-                {/* adds the entry to the list*/}
-                <h2>Restaurant Entries</h2>
                 <ul className="restaurant-list">
                     {restaurants.length == 0 && <li>No entries yet.</li>}
                     {restaurants.map((r,i) => (
                         <li 
-                            key={i}
+                            key={r.id ?? i}
                             className = {`restaurant-item ${expandedIdx==i ? "expanded" : ""}`}
                             onClick={() => setExpandedIdx(prev => (prev==i ? null : i))}
                         >
@@ -152,13 +223,13 @@ function Restaurant(){
                                     <input 
                                         type="checkbox" 
                                         className="entry-checkbox"
-                                        checked={selected.includes(i)}
+                                        checked={selected.includes(r.id)}
                                         onClick={(e) => e.stopPropagation()}  // prevent expand
                                         onChange={() => {
-                                            if (selected.includes(i)) {
-                                                setSelected(selected.filter(id => id !== i));
+                                            if (selected.includes(r.id)) {
+                                                setSelected(selected.filter(id => id !== r.id));
                                             } else {
-                                                setSelected([...selected, i]);
+                                                setSelected([...selected, r.id]);
                                             }
                                         }}
                                     />
@@ -185,12 +256,32 @@ function Restaurant(){
                 </ul>
 
 
-                {/* delete btn functionality */}
+                {/* delete btn functionality 
+                    UPDATED DELETE VIA BACKEND */}
                 <button 
                     className="delete-btn"
-                    onClick={() => {
-                        setRestaurants(restaurants.filter((_, i) => !selected.includes(i)));
-                        setSelected([]); // reset
+                    onClick={async () => {
+
+                        try {
+                            // delete each selected ID via backend
+                            await Promise.all(
+                                selected.map((id) =>
+                                    fetchAPI(`/api/restaurant/delete/${id}/`, {
+                                        method: "DELETE",
+                                    })
+                                )
+                            );
+
+                            // update local state
+                            setRestaurants(
+                                restaurants.filter((r) => !selected.includes(r.id))
+                            );
+                            setSelected([]); // reset 
+                        } catch (err) {
+                            console.error("Error deleting restaurants:", err);
+                        }
+                        //setRestaurants(restaurants.filter((_, i) => !selected.includes(i)));
+                        //setSelected([]); 
                     }}
                 >
                     Delete All Selected
