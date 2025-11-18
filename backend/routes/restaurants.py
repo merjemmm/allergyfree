@@ -17,6 +17,8 @@ def get_restaurants():
             "restid": r.restid,
             "name": r.name,
             "location": r.location,
+            "food": r.food, #H: added this 
+            "notes": r.notes, #H: added this
             "goodexp": r.goodexp,
             "created": r.created.isoformat() if r.created else None,
         }
