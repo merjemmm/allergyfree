@@ -30,8 +30,15 @@ function HomePage() {
         </div>
         <div>
           <p>Don't have an account? 
-            <Link to="/signup">
-              Sign Up!
+            <Link to="/signup" >
+              &nbsp; Sign Up Here!
+            </Link>
+          </p>
+        </div>
+        <div>
+          <p>Have an account? 
+            <Link to="/login" >
+              &nbsp; Log In Here!
             </Link>
           </p>
         </div>
