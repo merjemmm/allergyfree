@@ -21,8 +21,7 @@ def add_account_symptom():
 
     if not all([adder, category, symptom]):
         return jsonify({"status": "fail", 
-                        "error": "Missing required fields", 
-                        "statusCode": 400})
+                        "error": "Missing required fields"}), 400
 
     s = Symptom(adder=current_user.username,
                 category=category,
@@ -32,10 +31,9 @@ def add_account_symptom():
 
     return jsonify({"status": "success",
                     "message": "Symptom added successfully",
-                    "statusCode": 200,
                     "data": [ {"symptom_category": s.symptom_category, 
                                "symptom_name": s.symptom_name, 
-                               "date": s.date.isoformat()} ]})
+                               "date": s.date.isoformat()} ]}), 200
 
 # track occurrence of symptom in symptom logging table
 @profile_bp.route('/logsymptom', methods=['POST'])
@@ -50,8 +48,7 @@ def update_symptom_log():
 
     if not all([adder, category, symptom, date]):
         return jsonify({"status": "fail", 
-                        "error": "Missing required fields", 
-                        "statusCode": 400})
+                        "error": "Missing required fields"}), 400
 
     # TODO -- probably check format of date here
 
@@ -64,8 +61,7 @@ def update_symptom_log():
     db.session.commit()
 
     return jsonify({"status": "success",
-                    "message": "Symptom logged successfully",
-                    "statusCode": 200})
+                    "message": "Symptom logged successfully"}), 200
 
 # add new symptom category to symptomCategory table
 @profile_bp.route('/addcategory', methods=['POST'])
@@ -77,8 +73,7 @@ def add_account_category():
 
     if not all([adder, category]):
         return jsonify({"status": "fail", 
-                        "error": "Missing required fields", 
-                        "statusCode": 400})
+                        "error": "Missing required fields"}), 400
 
     c = SymptomCategory(adder=current_user.username,
                 category=category
@@ -88,8 +83,7 @@ def add_account_category():
 
     return jsonify({"status": "success",
                     "message": "Category added successfully",
-                    "statusCode": 200,
-                    "data": [ {"category": c.category} ]})
+                    "data": [ {"category": c.category} ]}), 200
 
 
 @profile_bp.route('/edit/password', methods=["POST"])
@@ -98,36 +92,31 @@ def update_password():
     data = request.get_json()
     
     old_password = data.get('password')
-    new_password1 = data.get('new_password1')
-    new_password2 = data.get('new_password2')
+    new_password1 = data.get('newPassword1')
+    new_password2 = data.get('newPassword2')
 
     if not (old_password and new_password1 and new_password2):
         return jsonify({"status": "fail", 
-                        "message": "Missing new or old password", 
-                        "statusCode": 400})
+                        "message": "Missing new or old password"}), 400
         
     if new_password1 != new_password2:
         return jsonify({"status": "fail", 
-                        "message": "The new passwords don't match", 
-                        "statusCode": 400})
+                        "message": "The new passwords don't match"}), 400
 
     user = User.query.filter_by(username=current_user.username).first()
 
     if not user:
         return jsonify({"status": "fail", 
-                        "message": "User does not exist", 
-                        "statusCode": 403})
+                        "message": "User does not exist"}), 403
 
     if not check_password_hash(user.password, old_password):
         return jsonify({"status": "fail", 
-                        "message": "Old password incorrect", 
-                        "statusCode": 403})
+                        "message": "Old password incorrect"}), 403
 
     user.password = generate_password_hash(new_password1)
     db.session.commit()
     return jsonify({"status": "success", 
-                    "message": "Password updated successfully", 
-                    "statusCode": 200})
+                    "message": "Password updated successfully"}), 200
     
     
 @profile_bp.route('/edit/username', methods=["POST"])
@@ -136,30 +125,26 @@ def update_username():
     
     data = request.get_json()
     
-    new_username = data.get('new_username')
+    new_username = data.get('newUsername')
 
     if not (new_username):
         return jsonify({"status": "fail", 
-                        "message": "Missing new username", 
-                        "statusCode": 400})
+                        "message": "Missing new username"}), 403
 
     user = User.query.filter_by(username=current_user.username).first()
     if not user:
         return jsonify({"status": "fail", 
-                        "message": "User does not exist", 
-                        "statusCode": 403})
+                        "message": "User does not exist"}), 403
         
     poss_user = User.query.filter_by(username=new_username).first()
     if poss_user:
         return jsonify({"status": "fail", 
-                        "message": "Username already taken", 
-                        "statusCode": 403})
+                        "message": "Username already taken"}), 409
 
     user.username = new_username
     db.session.commit()
     return jsonify({"status": "success", 
-                    "message": "Username updated successfully", 
-                    "statusCode": 200})
+                    "message": "Username updated successfully"}), 200
     
     
 @profile_bp.route('/edit/fullname', methods=["POST"])
@@ -167,25 +152,22 @@ def update_username():
 def update_fullname():
     data = request.get_json()
 
-    new_fullname = data.get("new_fullname")
+    new_fullname = data.get("newName")
 
     if not new_fullname:
         return jsonify({"status": "fail", 
-                        "message": "Missing new fullname", 
-                        "statusCode": 400})
+                        "message": "Missing new fullname"}), 403
 
     user = User.query.filter_by(username=current_user.username).first()
     if not user:
         return jsonify({"status": "fail", 
-                        "message": "User does not exist", 
-                        "statusCode": 403})
+                        "message": "User does not exist"}), 403
 
     user.fullname = new_fullname
     db.session.commit()
     
     return jsonify({"status": "success", 
-                    "message": "Fullname updated successfully", 
-                    "statusCode": 200})
+                    "message": "Fullname updated successfully"}), 200
 
 @profile_bp.route('/symptomcategories', methods=['GET'])
 @login_required

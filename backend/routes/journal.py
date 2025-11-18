@@ -16,8 +16,7 @@ def get_journal():
 
     if not month or not year:
         return jsonify({ "status": "fail", 
-                        "error": "Missing month or year", 
-                        "statusCode": 400})
+                        "error": "Missing month or year"}), 400
 
     # filtering by username, month, year, optionally day rn
     query = Journal.query.filter_by(adder=current_user.username)
@@ -39,9 +38,8 @@ def get_journal():
     return jsonify({
         "status": "success",
         "message": "Journal entries retrieved",
-        "statusCode": 200,
         "data": [journal_to_dict(e) for e in entries]
-    })
+    }), 200
 
 @journal_bp.route('/add', methods=['POST'])
 @login_required
@@ -53,8 +51,7 @@ def add_journal():
 
     if not meal or not name:
         return jsonify({"status": "fail", 
-                        "message": "Missing meal or name", 
-                        "statusCode": 400})
+                        "message": "Missing meal or name"}), 400
 
     journal_entry = Journal(
         adder=current_user.username,
@@ -67,6 +64,5 @@ def add_journal():
 
     return jsonify({
         "status": "success",
-        "message": "Journal entry added successfully",
-        "statusCode": 200
-    })
+        "message": "Journal entry added successfully"
+    }), 200

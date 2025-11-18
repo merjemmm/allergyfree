@@ -20,8 +20,7 @@ def get_entries():
     
     if not month:
         return jsonify({ "status": "error", 
-                        "error": "month query is empty", 
-                        "statusCode": 403})
+                        "error": "month query is empty"}), 403
         
     if not year:
         year = datetime.now().year
@@ -53,6 +52,5 @@ def get_entries():
     return jsonify({
         "status": "success",
         "message": "Calendar entries retrieved",
-        "statusCode": 200,
         "data": [symptom_to_dict(s) for s in calendar_entries]
-    })
+    }), 200

@@ -62,16 +62,17 @@ def handle_create():
     username = data.get("username")
     password = data.get("password")
     fullname = data.get("name")
+    
+    print("USERNAME : ", username, " PASSWORD: ", password, "NAME : ", fullname)
 
     if not username or not password or not fullname:
         return jsonify({"status": "fail", 
-                        "message": "Missing required fields", 
-                        "statusCode": 400})
+                        "message": "Missing required fields"}), 400
 
+    print("ALSO CURR : ", User.query.filter_by(username=username).first())
     if User.query.filter_by(username=username).first():
         return jsonify({"status": "fail", 
-                        "message": "User already exists", 
-                        "statusCode": 409})
+                        "message": "User already exists"}), 409
     
 
     hashed_password = generate_password_hash(password)
@@ -83,8 +84,7 @@ def handle_create():
     db.session.commit()
 
     return jsonify({"status": "success", 
-                    "message": "User created successfully", 
-                    "statusCode": 200})
+                    "message": "User created successfully"}), 200
 
 
 @auth_bp.route('/logout', methods=["POST"])
@@ -120,8 +120,7 @@ def handle_delete():
     db.session.commit()
     logout_user()
     return jsonify({"status": "success", 
-                    "message": "User deleted successfully", 
-                    "statusCode": 200})
+                    "message": "User deleted successfully"}), 200
 
 
 # will we need this?
@@ -131,12 +130,11 @@ def get_user(username):
     user = User.query.filter_by(username=username).first()
     if not user:
         return jsonify({"status": "fail", 
-                        "message": "User not found", 
-                        "statusCode": 404})
+                        "message": "User not found"}), 404
     data = {
         "username": user.username,
         "fullname": user.fullname,
     }
     return jsonify({"status": "success", 
-                    "message": "User retrieved successfully", 
-                    "statusCode": 200, "data": data})
+                    "message": "User retrieved successfully",
+                    "data": data}), 200

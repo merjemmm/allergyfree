@@ -134,6 +134,105 @@ function Profile() {
         }
     };
 
+    const handleEditProfile = async (event) => {
+        event.preventDefault();
+        setError('');
+        console.log("Clicked edit profile button");
+
+        const newUsername = event.target.username.value;
+        const newPassword = event.target.password.value;
+        const newName = event.target.name.value;
+
+        if (newUsername) {
+            if (newUsername.includes(' ')) {
+                console.log("username", newUsername);
+                setError("Username can't have spaces");
+            } else {
+                try {
+                    let response = await fetchAPI("/api/profile/edit/username", {
+                        method: 'POST',
+                        headers: {
+                        'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({newUsername}),
+                    });
+                    
+                    if (response.ok) {
+                        console.log("New Username ", newUsername);
+                        event.target.username.value = '';
+                    } else {
+                        // "Invalid credentials"
+                        console.log("invalid try");
+                        setError("Username already exists");
+                    }
+                    // await response.json()
+                        // .then(d => setError(d.error));
+                } catch (e) {
+                    console.error(e);
+                    setError(e.message);
+                }
+            }
+        }
+
+        // TODO - need to make more special teh password change
+        if (newPassword) {
+            try {
+                let response = await fetchAPI("/api/profile/edit/password", {
+                    method: 'POST',
+                    headers: {
+                    'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({newPassword}),
+                });
+                
+                if (response.ok) {
+                    console.log("New Password ", newPassword);
+                    event.target.password.value = '';
+                } else {
+                    // "Invalid credentials"
+                    console.log("invalid try")
+                    setError("Something went wrong, try again!");
+
+                    console.log(error)
+                }
+                // await response.json()
+                //     .then(d => setError(d.error));
+            } catch (e) {
+                console.error(e);
+                setError(e.message);
+            }
+        }
+
+        if (newName) {
+            try {
+                let response = await fetchAPI("/api/profile/edit/fullname", {
+                    method: 'POST',
+                    headers: {
+                    'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({newName}),
+                });
+                
+                if (response.ok) {
+                    console.log("new Name ", newName);
+ 
+                    event.target.name.value = '';
+                } else {
+
+                    console.log("invalid try")
+                    setError("Something went wrong, try again");
+
+                    console.log(error)
+                }
+                await response.json()
+                    .then(d => setError(d.error));
+            } catch (e) {
+                console.error(e);
+                setError(e.message);
+            }
+        }
+    };
+
     return (
     <>
         <Navbar />
@@ -143,16 +242,22 @@ function Profile() {
                 <section className="card profile-card">
                 <h2>Edit Profile Information</h2>
 
-                <label className="label">Name</label>
-                <input type="text" placeholder="Your name" />
+                <form id="editprofile" method="post" onSubmit={handleEditProfile}>
+                    <label className="label">Name</label>
+                    <input type="text" id="name" placeholder="Your name" />
 
-                <label className="label">Email</label>
-                <input type="email" placeholder="you@example.com" />
+                    <label className="label">Email</label>
+                    <input id="username" placeholder="funusernamexample" />
 
-                <label className="label">Password</label>
-                <input type="password" placeholder="••••••••" />
+                    <label className="label">Password</label>
+                    <input type="password" id="password" placeholder="••••••••" />
 
-                <button className="update-btn">Update Profile</button>
+                    <button className="update-btn" type="submit">Update Profile</button>
+                </form>
+                
+                {error && (
+                <p className="error">{error}</p>
+                )}
                 </section>
 
                 <section className="card add-symptom-category">

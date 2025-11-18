@@ -2,8 +2,7 @@ PRAGMA foreign_keys = ON;
 
 INSERT INTO users(username, fullname, password)
 VALUES 
-    ('baseuser', 'Base User', 'pass'
-    );
+    ('baseuser', 'Base User', 'pass');
 
 -- + sqlite3 -batch -line var/insta485.sqlite3 'SELECT * FROM posts'
 INSERT INTO restaurants(location, name, adder, goodexp)
