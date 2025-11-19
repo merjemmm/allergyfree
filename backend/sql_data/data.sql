@@ -20,6 +20,8 @@ VALUES
     ('baseuser', CURRENT_TIMESTAMP, 'brain', 'bad pain', 'migraine');
 
 
--- INSERT INTO journal(location, name, adder)
--- VALUES
---     ("Ann Arbor", "Bodego Bros", '1');
+INSERT INTO journal(adder, meal, food, ingredients, notes, symptoms)
+VALUES
+    ('baseuser', "Breakfast", "cereal", "wheat, sugar", "tasty", "Stomachache"),
+    ('baseuser', "Lunch", "sandwich", "ham, lettuce", "okay", "None"),
+    ('baseuser', "Dinner", "noodles", "rice", "tasty", "None");

@@ -62,4 +62,8 @@ class Journal(db.Model):
     user = db.relationship('User')
     created = db.Column(db.DateTime)
     meal = db.Column(db.String(64))
-    name = db.Column(db.String(20))
+    food = db.Column(db.String(32))
+    ingredients = db.Column(db.String(256))
+    notes = db.Column(db.String(512))
+    symptoms = db.Column(db.String(64))
+

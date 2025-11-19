@@ -32,7 +32,10 @@ def get_journal():
             "adder": entry.adder,
             "created": entry.created.isoformat() if entry.created else None,
             "meal": entry.meal,
-            "name": entry.name,
+            "food": entry.food,
+            "ingredients": entry.ingredients,
+            "notes": entry.notes,
+            "symptoms": entry.symptoms
         }
 
     return jsonify({
@@ -46,10 +49,13 @@ def get_journal():
 def add_journal():
     data = request.get_json()
     meal = data.get("meal")
-    name = data.get("name")
+    food = data.get("food")
+    ingredients = data.get("ingredients")
+    notes = data.get("notes")
+    symptoms = data.get("symptoms")
     created_time = datetime.now()
 
-    if not meal or not name:
+    if not meal or not food:
         return jsonify({"status": "fail", 
                         "message": "Missing meal or name"}), 400
 
@@ -57,7 +63,10 @@ def add_journal():
         adder=current_user.username,
         created=created_time,
         meal=meal,
-        name=name
+        food=food,
+        ingredients=ingredients,
+        notes=notes,
+        symptoms=symptoms
     )
     db.session.add(journal_entry)
     db.session.commit()

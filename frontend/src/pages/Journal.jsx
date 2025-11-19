@@ -8,35 +8,72 @@ import Navbar from "../components/NavBar";
 import '../styles/styles.css';
 
 
-// TODO: fetch symptoms from database
-const options = [
-    {value: "Headache", label: "Headache"},
-    {value: "Nausea", label: "Nausea"},
-    {value: "Joint Pain", label: "Joint Pain"},
-]
-
-function UserSymptoms() {
-    const [symptoms, setSymptoms] = useState([]);
-
-    const handleChange = (symptoms) => {
-        setSymptoms(symptoms || []);
-    };
-    return (
-    <>
-    <label>Symptoms (select all that apply)</label>
-    <form>
-        <Select
-            options={options}
-            onChange={handleChange}
-            value={symptoms}
-            isMulti
-        />
-    </form>
-    </>
-    )
-}
-
 function Journal() {
+    const [meal, setMeal] = useState("");
+    const [food, setFood] = useState("");
+    const [ingredients, setIngredients] = useState("");
+    const [notes, setNotes] = useState("");
+    const [symptoms, setSymptoms] = useState("");
+    
+    const [entries, setEntries] = useState([])
+
+    const mealTypes = [
+        {value: "Snack", label: "Snack"},
+        {value: "Breakfast", label: "Breakfast"},
+        {value: "Lunch", label: "Lunch"},
+        {value: "Dinner", label: "Dinner"}
+    ]
+
+    const retrieveEntries = function (e) {
+        //e.preventDefault()
+        const date = new Date()
+        fetchAPI(`/api/journal/entries?month=${date.getMonth()}&year=${date.getFullYear()}`, {
+            method: 'GET',
+            headers: { 'Content-type': 'application/json' },
+        })
+        .then((resp) => resp.json())
+        .then((json) => {
+            setEntries(json.data)
+        })
+    }
+
+    useEffect(() => {
+        let ignore = false;
+        if (!ignore)  retrieveEntries()
+        return () => { ignore = true; }
+    },[]);
+
+    const handleSubmit = (event) => {
+        event.preventDefault();
+        const journalInfo = {
+          meal: meal,
+          food: food,
+          ingredients: ingredients,
+          notes: notes,
+          symptoms: symptoms
+        };
+
+        fetchAPI("/api/journal/add", {
+          method: "POST",
+          headers: {
+            "Content-Type": "Application/JSON",
+          },
+          body: JSON.stringify(journalInfo),
+        })
+          .then((respose) => respose.json())
+          .then((newEntry) => {
+            setMeal("");
+            setFood("");
+            setIngredients("");
+            setNotes("");
+            setSymptoms("");
+          })
+          .then(() => retrieveEntries())
+          .catch((error) => {
+            console.log(error);
+          });
+    };
+
     return (
         <>
         <Navbar />
@@ -45,27 +82,61 @@ function Journal() {
             <div className="left-panel card">
             <h3>New Food Journal Entry</h3>
             <p>Input your food and track associated symptoms</p>
+            <form onSubmit={handleSubmit}>
+                <label>Meal Type</label>
+                <select
+                    name="meal"
+                    value={meal}
+                    onChange={(event) => setMeal(event.target.value)}
+                >
+                    {mealTypes.map((meal) => (
+                        <option>
+                            {meal.value}
+                        </option>
+                    ))}
+                </select>
 
-            <label>Meal type</label>
-            <select>
-                <option>Snack</option>
-                <option>Breakfast</option>
-                <option>Lunch</option>
-                <option>Dinner</option>
-            </select>
+                <label>Food Name</label>
+                <input
+                    type="text"
+                    name="food name"
+                    placeholder="e.g., hummus and pita chips"
+                    value={food}
+                    onChange={(event) => setFood(event.target.value)}
+                />
 
-            <label>Food Name</label>
-            <input type="text" placeholder="e.g., hummus and pita chips"/>
+                <label>Ingredients</label>
+                <input
+                    type="text"
+                    name="ingredients"
+                    placeholder="e.g., flour, yeast; chickpeas, tahini"
+                    value={ingredients}
+                    onChange={(event) => setIngredients(event.target.value)}
+                />
 
-            <label>Ingredients</label>
-            <input type="text" placeholder="e.g., flour, yeast; chickpeas, tahini"/>
+                <label>Notes</label>
+                <textarea
+                    type="text"
+                    name="notes"
+                    rows="3"
+                    placeholder="Add any notes..."
+                    value={notes}
+                    onChange={(event) => setNotes(event.target.value)}
+                />
 
-            <label>Notes</label>
-            <textarea placeholder="Add any notes..."></textarea>
+                <label>Symptoms</label>
+                <select
+                    name="symptoms"
+                    value={meal}
+                    onChange={(event) => setSymptoms(event.target.value)}
+                >
+                    <option value="">Symptoms</option>
+                    <option>Headache</option>
+                    <option>Trouble breathing</option>
+                </select>
 
-            <UserSymptoms></UserSymptoms>
-
-            <button className="save-btn">Save Entry</button>
+                <button className="save-btn">Save Entry</button>
+            </form>
             </div>
 
             <div className="right-panel">
@@ -82,15 +153,9 @@ function Journal() {
             <div className="entry-card">
                 <h3>All Entries</h3>
                 <div className="entry-section">
-                <div className="entry"><span>Lunch: caesar salad</span><small>Oct 20, 2025</small></div>
-                <div className="entry"><span>Snack: hummus and pita chips</span><small>Oct 20, 2025</small></div>
-                <div className="entry"><span>Breakfast: blueberry pancakes</span><small>Oct 12, 2025</small></div>
-                <div className="entry"><span>Lunch: PB&J</span><small>Oct 12, 2025</small></div>
-                <div className="entry"><span>Snack: granola oats and honey bar</span><small>Oct 12, 2025</small></div>
-                <div className="entry"><span>Dinner: spaghetti and garlic bread</span><small>Oct 12, 2025</small></div>
-                <div className="entry"><span>Breakfast: eggs on toast</span><small>Oct 11, 2025</small></div>
-                <div className="entry"><span>Lunch: grilled cheese and potato chips</span><small>Oct 11, 2025</small></div>
-                <div className="entry"><span>Snack: peanut butter and bananas</span><small>Oct 11, 2025</small></div>
+                    {entries.map((entry) => (
+                        <div className="entry"><span>{entry.meal}: {entry.food}</span><small>{entry.created}</small></div>
+                    ))}
                 </div>
             </div>
             </div>
