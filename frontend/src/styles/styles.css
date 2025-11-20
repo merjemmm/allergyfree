@@ -113,6 +113,11 @@ body {
     gap: 2rem;
 }
 
+.navbar-right {
+    font-size: 1rem;
+    /* cursor: pointer; */
+}
+
 .nav-item {
     display: flex;
     align-items: center;
@@ -134,11 +139,6 @@ body {
 .nav-item:hover {
     background-color: var(--accent-green);
     color: var(--dark-green);
-}
-
-.navbar-right {
-    font-size: 1.5rem;
-    cursor: pointer;
 }
 
 /* Layout */

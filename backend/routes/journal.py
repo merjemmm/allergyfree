@@ -19,10 +19,14 @@ def get_journal():
                         "error": "Missing month or year"}), 400
 
     # filtering by username, month, year, optionally day rn
-    query = Journal.query.filter_by(adder=current_user.username)
-    query = query.filter(db.extract('month', Journal.created) == month, db.extract('year', Journal.created) == year)
+    query = Journal.query.filter(db.extract('month', Journal.created) == month, 
+                                    db.extract('year', Journal.created) == year,
+                                    Journal.adder==current_user.username)
     if day:
-        query = query.filter(db.extract('day', Journal.created) == day)
+        query = Journal.query.filter(db.extract('month', Journal.created) == month, 
+                                    db.extract('year', Journal.created) == year,
+                                    db.extract('day', Journal.created) == day,
+                                    Journal.adder==current_user.username)
 
     entries = query.all()
 
@@ -41,7 +45,7 @@ def get_journal():
     return jsonify({
         "status": "success",
         "message": "Journal entries retrieved",
-        "data": [journal_to_dict(e) for e in entries]
+        "entries": [journal_to_dict(e) for e in entries]
     }), 200
 
 @journal_bp.route('/add', methods=['POST'])

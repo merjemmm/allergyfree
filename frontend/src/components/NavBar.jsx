@@ -30,9 +30,9 @@ function Navbar() {
                 </Link>
             </div>
             <div className="navbar-right">
-                <Link to="/profile">
-                {/* TODO Prettify */}
-                    👤
+                <Link to="/profile" 
+                className={isActive("/profile") ? "nav-item active" : "nav-item"}>
+                    👤 Profile
                 </Link>
             </div>
     </div>

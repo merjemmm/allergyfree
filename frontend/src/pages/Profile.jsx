@@ -13,6 +13,9 @@ function Profile() {
 
     let navigate = useNavigate();
     const [error, setError] = useState('');
+    const [profileNameMessage, setProfileNameMessage] = useState('');
+    const [profilePasswordMessage, setProfilePasswordMessage] = useState('');
+    const [profileUserMessage, setProfileUserMessage] = useState('');
 
     // function GETs all categories to return in profile dropdown
     const fetchSymptomCategories = async () => {
@@ -159,14 +162,13 @@ function Profile() {
                     
                     if (response.ok) {
                         console.log("New Username ", newUsername);
+                        setProfileUserMessage("Sucess in updating your Username");
                         event.target.username.value = '';
                     } else {
                         // "Invalid credentials"
-                        console.log("invalid try");
+                        console.log("invalid try in username");
                         setError("Username already exists");
                     }
-                    // await response.json()
-                        // .then(d => setError(d.error));
                 } catch (e) {
                     console.error(e);
                     setError(e.message);
@@ -190,7 +192,7 @@ function Profile() {
                     event.target.password.value = '';
                 } else {
                     // "Invalid credentials"
-                    console.log("invalid try")
+                    console.log("invalid try in password")
                     setError("Something went wrong, try again!");
 
                     console.log(error)
@@ -219,13 +221,13 @@ function Profile() {
                     event.target.name.value = '';
                 } else {
 
-                    console.log("invalid try")
+                    console.log("invalid try in new name")
                     setError("Something went wrong, try again");
 
                     console.log(error)
                 }
-                await response.json()
-                    .then(d => setError(d.error));
+                // await response.json()
+                //     .then(d => setError(d.error));
             } catch (e) {
                 console.error(e);
                 setError(e.message);
@@ -239,25 +241,50 @@ function Profile() {
         <div className="wrap">
             <div className="grid">
             <div>
+
+                {/* TODO - need something to display current infomration for user */}
+                <section className="card profile-card">
+                <h2>Current Profile Information</h2>
+
+                <label className="label">Full Name</label>
+                <h3 className="error">{profileNameMessage}</h3>
+
+                <label className="label">Username</label>
+                <h3 className="error">{username}</h3>
+
+                </section>
+
+
+
                 <section className="card profile-card">
                 <h2>Edit Profile Information</h2>
 
                 <form id="editprofile" method="post" onSubmit={handleEditProfile}>
-                    <label className="label">Name</label>
+                    <label className="label">New Full Name</label>
                     <input type="text" id="name" placeholder="Your name" />
 
-                    <label className="label">Email</label>
+                    {profileNameMessage && (
+                    <p className="error">{profileNameMessage}</p>
+                    )}
+
+                    <label className="label">New Username</label>
                     <input id="username" placeholder="funusernamexample" />
 
-                    <label className="label">Password</label>
+                    {profileUserMessage && (
+                    <p className="error">{profileUserMessage}</p>
+                    )}
+
+
+                    <label className="label">New Password</label>
                     <input type="password" id="password" placeholder="••••••••" />
+
+                    {profilePasswordMessage && (
+                    <p className="error">{profilePasswordMessage}</p>
+                    )}
+
 
                     <button className="update-btn" type="submit">Update Profile</button>
                 </form>
-                
-                {error && (
-                <p className="error">{error}</p>
-                )}
                 </section>
 
                 <section className="card add-symptom-category">

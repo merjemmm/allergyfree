@@ -35,20 +35,17 @@ def handle_login():
     # If the username or password fields are empty, abort(400)
     if not username or not password:
         return jsonify({"status" : "fail",
-                        "message" : "Missing username or password",
-                        "statusCode" : 403 })
+                        "message" : "Missing username or password"}), 403
 
     user = User.query.filter_by(username=username).first()
     if user is None or not check_password_hash(user.password, password):
         return jsonify({"status": "fail", 
-                        "message": "Invalid username or password", 
-                        "statusCode": 403})
+                        "message": "Invalid username or password"}), 403
 
     login_user(user, remember=True)
 
     return jsonify({"status": "success", 
-                    "message": "Logged in successfully", 
-                    "statusCode": 200})
+                    "message": "Logged in successfully"}), 200
 
 
 # curl -X POST http://127.0.0.1:5000/api/accounts/create \

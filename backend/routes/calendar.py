@@ -28,7 +28,7 @@ def get_entries():
     query = Symptom.query.filter(
         extract('year', Symptom.date) == year,
         extract('month', Symptom.date) == month,
-        adder=current_user.username)
+        Syptom.adder==current_user.username)
 
     
     if day:
@@ -36,7 +36,7 @@ def get_entries():
             extract('year', Symptom.date) == year,
             extract('month', Symptom.date) == month,
             extract('day', Symptom.date) == day,
-            adder=current_user.username)
+            Symptom.adder==current_user.username)
         
     calendar_entries = query.all()
 

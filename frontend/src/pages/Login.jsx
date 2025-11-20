@@ -38,9 +38,10 @@ function LoginPage() {
           else {
             // set username to null on invalid attempts
             setUsername(null);
+            setError("Incorrect login. Try again!")
           }
-          await response.json()
-            .then(d => setError(d.error));
+          // await response.json()
+          //   .then(d => setError(d.error));
             
           
       } catch (e) {

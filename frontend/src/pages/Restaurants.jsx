@@ -10,6 +10,7 @@ import '../styles/styles.css';
 function Restaurant() {
 
     const { username, setUsername } = useContext(UserContext);
+    const [error, setError] = useState('');
     // ADDED CODE
 
     // 'restaurants' holds current data, an array of entries
@@ -49,10 +50,9 @@ function Restaurant() {
 
             if (!response.ok) {
                 console.error("Failed to load restaurants:", data);
+                setError("error in loading restaurants")
                 return;
-            }
-
-            if (data.status == "success") {
+            } else {
                 const mapped = data.restaurants.map((r) => ({
                     id: r.restid,
                     name: r.name,
@@ -62,11 +62,10 @@ function Restaurant() {
                     good_experience: r.goodexp,
                 }));
                 setRestaurants(mapped);
-            } else {
-                console.error("Failed to load restaurants:", data);
             }
         } catch (err) {
             console.error("Error loading restaurants:", err);
+            setError(err);
         }
     };
 
@@ -91,7 +90,6 @@ function Restaurant() {
         e.preventDefault(); // prevents browser from refreshing on save entry
         if (!formData.name.trim()) return; // user cant save without restaurant name
 
-        // UPDATED BACKEND PART HERE...
         try {
             const response = await fetchAPI("/api/restaurant/add", {
                 method: "POST",
@@ -275,10 +273,6 @@ function Restaurant() {
                     <li>Domino’s Pizza <span className="thumb-down small">👎</span></li>
                     <li className="highlighted">Madras Masala <span className="thumb-down small">👎</span></li>*/}
 
-
-
-                    {/* delete btn functionality 
-                    UPDATED DELETE VIA BACKEND */}
                     <button
                         className="delete-btn"
                         onClick={async () => {
