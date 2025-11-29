@@ -19,6 +19,30 @@ function Profile() {
     const [profilePasswordMessage, setProfilePasswordMessage] = useState('');
     const [profileUserMessage, setProfileUserMessage] = useState('');
 
+    const fetchUserFullname = async () => {
+        setError('');
+        try {
+            const response = await fetchAPI("/api/profile/fullname", {
+                method: 'GET',
+                headers: {
+                'Content-Type': 'application/json'
+                },
+            });
+            const data = await response.json();
+            if (!response.ok) {
+                setError(data.error);
+            } else {
+                setProfileNameMessage(data.fullname);
+            }
+        } catch (e) {
+            setError(e.message);
+        }
+    };
+
+    useEffect(() => {
+     fetchUserFullname();
+    }, []);
+
     // function GETs all categories to return in profile dropdown
     const fetchSymptomCategories = async () => {
         setError('');
@@ -90,7 +114,6 @@ function Profile() {
             } else {
                 // this sets data for symptoms
                 setSymptoms(data);
-                console.log(data);
             }
         } catch (e) {
             console.error(e);
@@ -139,6 +162,7 @@ function Profile() {
         );
     }
 
+    // this is for use for just listing symptoms alone
     function SymptomList() {
         if (!symptoms) {
             return <p>No symptoms yet</p>; // Handle null/undefined

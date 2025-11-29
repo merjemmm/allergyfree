@@ -84,7 +84,7 @@ def add_account_category():
                     "message": "Category added successfully",
                     "data": [ {"category": c.category} ]}), 200
 
-
+# edit password
 @profile_bp.route('/edit/password', methods=["POST"])
 @login_required
 def update_password():
@@ -116,8 +116,8 @@ def update_password():
     db.session.commit()
     return jsonify({"status": "success", 
                     "message": "Password updated successfully"}), 200
-    
-    
+
+# edit username
 @profile_bp.route('/edit/username', methods=["POST"])
 @login_required
 def update_username():
@@ -144,8 +144,8 @@ def update_username():
     db.session.commit()
     return jsonify({"status": "success", 
                     "message": "Username updated successfully"}), 200
-    
-    
+
+# edit fullname
 @profile_bp.route('/edit/fullname', methods=["POST"])
 @login_required
 def update_fullname():
@@ -168,6 +168,7 @@ def update_fullname():
     return jsonify({"status": "success", 
                     "message": "Fullname updated successfully"}), 200
 
+# this returns a list of symptom categories
 @profile_bp.route('/symptomcategories', methods=['GET'])
 @login_required
 def get_categories():
@@ -175,9 +176,7 @@ def get_categories():
                     .filter_by(adder=current_user.username)
                     .distinct()
                     .all())
-    print('rows:', rows)
     categories = [r.category for r in rows]
-    print('categories:', rows)
     return jsonify(categories), 200
 
 # this returns just a list of symptoms
@@ -221,3 +220,9 @@ def get_symptoms_by_category():
 
     return jsonify(symptoms_by_category), 200
 
+# returns user's Full Name to be displayed on profile
+@profile_bp.route('/fullname', methods=['GET'])
+@login_required
+def get_fullname():
+    user = User.query.filter_by(username=current_user.username).first()
+    return jsonify({"fullname": user.fullname}), 200
