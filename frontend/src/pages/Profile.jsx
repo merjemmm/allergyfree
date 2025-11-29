@@ -274,7 +274,6 @@ function Profile() {
         console.log("Clicked edit profile button");
 
         const newUsername = event.target.username.value;
-        const newPassword = event.target.password.value;
         const newName = event.target.name.value;
 
         if (newUsername) {
@@ -304,35 +303,6 @@ function Profile() {
                     console.error(e);
                     setError(e.message);
                 }
-            }
-        }
-
-        // TODO - need to make more special teh password change
-        if (newPassword) {
-            try {
-                let response = await fetchAPI("/api/profile/edit/password", {
-                    method: 'POST',
-                    headers: {
-                    'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({newPassword}),
-                });
-                
-                if (response.ok) {
-                    console.log("New Password ", newPassword);
-                    event.target.password.value = '';
-                } else {
-                    // "Invalid credentials"
-                    console.log("invalid try in password")
-                    setError("Something went wrong, try again!");
-
-                    console.log(error)
-                }
-                // await response.json()
-                //     .then(d => setError(d.error));
-            } catch (e) {
-                console.error(e);
-                setError(e.message);
             }
         }
 
@@ -366,6 +336,52 @@ function Profile() {
         }
     };
 
+    const handleEditPassword = async (event) => {
+        setError('');
+        console.log("Clicked edit password button");
+        // TODO fix
+        const oldPassword = event.target.old_password.value;
+        const newPassword = event.target.password.value;
+        const newPassword2 = event.target.confirm_password.value;
+        if (newPassword !== newPassword2) {
+            setError("Passwords don't match");
+            return;
+        }
+        
+        try {
+            let response = await fetchAPI("/api/profile/edit/password", {
+                method: 'POST',
+                headers: {
+                'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ oldPassword, newPassword }),
+            });
+
+            if (response.ok) {
+                setProfilePasswordMessage("Password updated successfully");
+                console.log("New Password ", newPassword);
+                event.target.password.value = '';
+                event.target.confirm_password.value = '';
+            } else {
+                // "Invalid credentials"
+                console.log("invalid try in password")
+                setError("Something went wrong, try again!");
+                console.log(error)
+            }
+            let errorMessage = "Something went wrong";
+            if (response.headers.get("content-type")?.includes("application/json")) {
+                const data = await response.json();
+                errorMessage = data.error || errorMessage;
+            }
+            // setError(errorMessage);
+            // await response.json()
+            //     .then(d => setError(d.error));
+        } catch (e) {
+            console.error(e);
+            setError(e.message);
+        }
+    };
+
     return (
     <>
         <Navbar />
@@ -392,27 +408,29 @@ function Profile() {
                     <label className="label">New Full Name</label>
                     <input type="text" id="name" placeholder="Your name" />
 
-                    {profileNameMessage && (
-                    <p className="error">{profileNameMessage}</p>
-                    )}
-
                     <label className="label">New Username</label>
                     <input type="text" id="username" placeholder="funusernamexample" />
 
-                    {profileUserMessage && (
-                    <p className="error">{profileUserMessage}</p>
-                    )}
-
-
-                    <label className="label">New Password</label>
-                    <input type="password" id="password" placeholder="••••••••" />
-
-                    {profilePasswordMessage && (
-                    <p className="error">{profilePasswordMessage}</p>
-                    )}
-
-
                     <button className="update-btn" type="submit">Update Profile</button>
+                </form>
+                </section>
+
+                <section className="card profile-card">
+                <h2>Edit Password</h2>
+
+                <form id="editpassword" method="post" onSubmit={handleEditPassword}>
+                    
+                    <label className="label">Current Password</label>
+                    <input type="password" name="password" placeholder="Current Password" required />
+                    <label className="label">New Password</label>
+                    <input type="password" id="password" placeholder="Password" required/>
+                    <label className="label">Retype Password</label>
+                    <input type="password" id="confirm_password" placeholder="Confirm Password" required/>
+                    {profilePasswordMessage && (
+                        <p className="success">{profilePasswordMessage}</p>
+                    )}
+
+                    <button className="update-btn" type="submit">Update Password</button>
                 </form>
                 </section>
 
