@@ -25,15 +25,14 @@ def add_account_symptom():
 
     s = Symptom(adder=current_user.username,
                 category=category,
-                name=symptom)
+                symptom=symptom)
     db.session.add(s)
     db.session.commit()
 
     return jsonify({"status": "success",
                     "message": "Symptom added successfully",
-                    "data": [ {"symptom_category": s.symptom_category, 
-                               "symptom_name": s.symptom_name, 
-                               "date": s.date.isoformat()} ]}), 200
+                    "data": [ {"category": s.category, 
+                               "symptom": s.symptom} ]}), 200
 
 # track occurrence of symptom in symptom logging table
 @profile_bp.route('/logsymptom', methods=['POST'])
@@ -180,4 +179,45 @@ def get_categories():
     categories = [r.category for r in rows]
     print('categories:', rows)
     return jsonify(categories), 200
+
+# this returns just a list of symptoms
+@profile_bp.route('/symptoms', methods=['GET'])
+@login_required
+def get_symptoms():
+    rows = (db.session.query(Symptom)
+                    .filter_by(adder=current_user.username)
+                    .order_by(Symptom.category, Symptom.symptom)
+                    .distinct()
+                    .all())
+
+    symptoms = [row.symptom for row in rows]
+
+    return jsonify(symptoms), 200
+
+
+# this returns symptoms sorted by category, e.g.
+# {
+#   "Dermatological": ["Hives", "Itchiness", "Rash", "Swelling"],
+#   "Respiratory": ["Coughing", "Sneezing Fit", "Throat Tightness"],
+#   "Mental / Cognitive": ["Anxiety", "Brain Fog", "Fatigue", "Headache"]
+# }
+@profile_bp.route('/symptomsbycategory', methods=['GET'])
+@login_required
+def get_symptoms_by_category():
+
+    rows = (db.session.query(Symptom)
+                    .filter_by(adder=current_user.username)
+                    .order_by(Symptom.category, Symptom.symptom)
+                    .distinct()
+                    .all())
+
+    # list of dicts grouped by category
+    symptoms_by_category = {}
+    for row in rows:
+        category = row.category
+        if category not in symptoms_by_category:
+            symptoms_by_category[category] = []
+        symptoms_by_category[category].append(row.symptom)
+
+    return jsonify(symptoms_by_category), 200
 

@@ -10,6 +10,8 @@ function Profile() {
 
     const {username, setUsername} = useContext(UserContext);
     const [categories, setCategories] = useState(null);
+    const [symptomsByCategory, setSymptomsByCategory] = useState(null);
+    const [symptoms, setSymptoms] = useState(null);
 
     let navigate = useNavigate();
     const [error, setError] = useState('');
@@ -43,9 +45,113 @@ function Profile() {
      fetchSymptomCategories();
     }, []);
 
+    // function GETS all symptoms and their categories to display on profile
+    const fetchSymptomsByCategory = async () => {
+        setError('');
+        try {
+            let response = await fetchAPI("/api/profile/symptomsbycategory", {
+                method: 'GET',
+                headers: {
+                'Content-Type': 'application/json'
+                },
+            });
+            const data = await response.json();
+            if (!response.ok) {
+                setError(data.error);
+            } else {
+                // this sets data for symptoms sorted by category
+                setSymptomsByCategory(data);
+
+            }
+        } catch (e) {
+            console.error(e);
+            setError(e.message);
+        }
+    };
+
+    // should run every time symptoms are updated
+    useEffect(() => {
+     fetchSymptomsByCategory();
+    }, []);
+
+    // function GETS all symptoms and their categories to display on profile
+    const fetchSymptoms = async () => {
+        setError('');
+        try {
+            let response = await fetchAPI("/api/profile/symptoms", {
+                method: 'GET',
+                headers: {
+                'Content-Type': 'application/json'
+                },
+            });
+            const data = await response.json();
+            if (!response.ok) {
+                setError(data.error);
+            } else {
+                // this sets data for symptoms
+                setSymptoms(data);
+                console.log(data);
+            }
+        } catch (e) {
+            console.error(e);
+            setError(e.message);
+        }
+    };
+
+    // should run every time symptoms are updated
+    useEffect(() => {
+     fetchSymptoms();
+    }, []);
+
     function CategoryList() {
-        const CategoryList = categories?.map(category => <option>{category}</option>);
-        return <select>{CategoryList}</select>;
+        return (
+            <select name="category" id="category" required>
+            {categories?.map((category) => (
+                <option key={category} value={category}>
+                {category}
+                </option>
+            ))}
+            </select>
+        );
+    }
+
+    function SymptomByCategoryList() {
+        if (!symptomsByCategory) {
+            return <p>No symptoms yet</p>; // Handle null/undefined
+        }
+        return (
+            <div>
+                {Object.entries(symptomsByCategory).map(([category, symptomList]) => (
+                <div className="symptoms-section"key={category}>
+                    <h3>{category}</h3>
+                    <div className="tag-list">
+                        {symptomList.map((symptom, i) => (
+                            // right now I render them all purple lol TODO fix
+                            <span className="pill purple" key={i}>
+                                {symptom}
+                            </span>
+                        ))}
+                    </div>
+                    
+                </div>
+                ))}
+            </div>
+        );
+    }
+
+    function SymptomList() {
+        if (!symptoms) {
+            return <p>No symptoms yet</p>; // Handle null/undefined
+        }
+        return (
+            <select name="symptom" id="symptom" multiple={true} required>
+                {symptoms?.map((symptom) => (
+                    <option key={symptom} value={symptom}>
+                    {symptom}
+                    </option>
+                ))}
+            </select>
+        );
     }
 
     // logs out user
@@ -114,6 +220,7 @@ function Profile() {
         setError('');
         console.log("Clicked add symptom button");
 
+        const adder = username;
         const symptom = event.target.symptom.value;
         const category = event.target.category.value;
 
@@ -123,7 +230,7 @@ function Profile() {
                 headers: {
                 'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({username, symptom, category}),
+                body: JSON.stringify({adder, symptom, category}),
             });
             
             if (response.ok) {
@@ -162,7 +269,7 @@ function Profile() {
                     
                     if (response.ok) {
                         console.log("New Username ", newUsername);
-                        setProfileUserMessage("Sucess in updating your Username");
+                        setProfileUserMessage("Success in updating your Username");
                         event.target.username.value = '';
                     } else {
                         // "Invalid credentials"
@@ -217,7 +324,7 @@ function Profile() {
                 
                 if (response.ok) {
                     console.log("new Name ", newName);
- 
+
                     event.target.name.value = '';
                 } else {
 
@@ -242,7 +349,7 @@ function Profile() {
             <div className="grid">
             <div>
 
-                {/* TODO - need something to display current infomration for user */}
+                {/* TODO - need something to display current information for user */}
                 <section className="card profile-card">
                 <h2>Current Profile Information</h2>
 
@@ -253,8 +360,6 @@ function Profile() {
                 <h3 className="error">{username}</h3>
 
                 </section>
-
-
 
                 <section className="card profile-card">
                 <h2>Edit Profile Information</h2>
@@ -268,7 +373,7 @@ function Profile() {
                     )}
 
                     <label className="label">New Username</label>
-                    <input id="username" placeholder="funusernamexample" />
+                    <input type="text" id="username" placeholder="funusernamexample" />
 
                     {profileUserMessage && (
                     <p className="error">{profileUserMessage}</p>
@@ -293,7 +398,7 @@ function Profile() {
                         <p className="muted">Input symptom categories for tracking</p>
                         <label className="label spaced">Symptom Category Name</label>
                         <input type="text" id = "category" placeholder="e.g., Respiratory" required/>
-                    <   button className="add-btn">Add Category</button>
+                        <button className="add-btn">Add Category</button>
                     </form>
                 
                 </section>
@@ -301,83 +406,32 @@ function Profile() {
                 <section className="card add-symptom">
                 <h2>Add New Symptom</h2>
                 <p className="muted">Input your symptoms by category for tracking</p>
-
-                <label className="label">Category</label>
-                <CategoryList/>
-
-                <label className="label spaced">Symptom Name</label>
-                <input type="text" placeholder="e.g., Migraine" />
-
-                <button className="add-btn">Add Symptom</button>
+                <form method="post" onSubmit={handleAddSymptom}>
+                    <label className="label">Category</label>
+                    <CategoryList/>
+                    <label className="label spaced">Symptom Name</label>
+                    <input type="text" id = "symptom" placeholder="e.g., Migraine" required/>
+                    <button className="add-btn">Add Symptom</button>
+                </form>
                 </section>
             </div>
 
             <aside className="card symptoms-card">
                 <h2>Symptoms to Track <span className="muted">(select all that apply)</span></h2>
 
-                <div className="symptoms-section">
-                <h3>Dermatological</h3>
-                <div className="tag-list">
-                    <span className="pill pink">Swelling</span>
-                    <span className="pill pink">Hives</span>
-                    <span className="pill pink">Itchiness</span>
-                    <span className="pill pink">Rash</span>
-                    <span className="pill pink">Numbness</span>
-                </div>
+                <div className="symptoms-list">
+                    <SymptomByCategoryList/>
                 </div>
 
-                <div className="symptoms-section">
-                <h3>Respiratory</h3>
-                <div className="tag-list">
-                    <span className="pill orange">Sneezing Fit</span>
-                    <span className="pill orange">Throat Tightness</span>
-                    <span className="pill orange">Congestion</span>
-                    <span className="pill orange">Coughing</span>
-                </div>
-                </div>
-
-                <div className="symptoms-section">
-                <h3>Musculoskeletal</h3>
-                <div className="tag-list">
-                    <span className="pill green">Joint Pain</span>
-                    <span className="pill green">Muscle Ache</span>
-                    <span className="pill green">Cramping</span>
-                    <span className="pill green">Limb Weakness</span>
-                </div>
-                </div>
-
-                <div className="symptoms-section">
-                <h3>Mental / Cognitive</h3>
-                <div className="tag-list">
-                    <span className="pill blue">Brain Fog</span>
-                    <span className="pill blue">Irritability</span>
-                    <span className="pill blue">Dizziness</span>
-                    <span className="pill blue">Headache</span>
-                    <span className="pill blue">Anxiety</span>
-                    <span className="pill blue">Fatigue</span>
-                </div>
-                </div>
-
-                <div className="symptoms-section">
-                <h3>GI / Intestinal</h3>
-                <div className="tag-list">
-                    <span className="pill purple">Acid Reflux</span>
-                    <span className="pill purple">Bloating</span>
-                    <span className="pill purple">Vomiting</span>
-                    <span className="pill purple">Nausea</span>
-                </div>
-                </div>
-
-                {/* <div className="symptoms-list">
-                <p className="muted">Selected symptoms or additional options would appear here. This panel is scrollable when long.</p>
+                 {/* TODO: handle deletion */}
+                {/* <div className="controls">
+                    <h2>Delete Symptoms <span className="muted">(select all)</span></h2>
+                    <form method="post" onSubmit={handleDeleteSymptom}>
+                    <label className="label"></label>
+                    <SymptomList/>
+                    <button className="add-btn">Delete Symptom(s)</button>
+                    </form>
                 </div> */}
-
-                <div className="controls">
-                <select>
-                    <option>Select Multiple</option>
-                </select>
-                <button className="delete">Delete</button>
-                </div>
             </aside>
             <div>
                 <section className="card profile-card">
