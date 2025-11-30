@@ -25,14 +25,14 @@ def get_entries():
     if not year:
         year = datetime.now().year
 
-    query = Symptom.query.filter(
+    query = SymptomLog.query.filter(
         extract('year', Symptom.date) == year,
         extract('month', Symptom.date) == month,
         Syptom.adder==current_user.username)
 
     
     if day:
-        query = Symptom.query.filter(
+        query = SymptomLog.query.filter(
             extract('year', Symptom.date) == year,
             extract('month', Symptom.date) == month,
             extract('day', Symptom.date) == day,

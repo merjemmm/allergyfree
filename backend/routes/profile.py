@@ -92,7 +92,7 @@ def update_password():
     
     old_password = data.get('oldPassword')
     new_password = data.get('newPassword')
-
+    
     user = User.query.filter_by(username=current_user.username).first()
     if not user:
         return jsonify({"status": "fail", 
@@ -111,7 +111,6 @@ def update_password():
 @profile_bp.route('/edit/username', methods=["POST"])
 @login_required
 def update_username():
-    
     data = request.get_json()
     
     new_username = data.get('newUsername')

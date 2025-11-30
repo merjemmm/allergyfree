@@ -15,6 +15,7 @@ function Profile() {
 
     let navigate = useNavigate();
     const [error, setError] = useState('');
+    const [fullName, setFullName] = useState('');
     const [profileNameMessage, setProfileNameMessage] = useState('');
     const [profilePasswordMessage, setProfilePasswordMessage] = useState('');
     const [profileUserMessage, setProfileUserMessage] = useState('');
@@ -32,7 +33,7 @@ function Profile() {
             if (!response.ok) {
                 setError(data.error);
             } else {
-                setProfileNameMessage(data.fullname);
+                setFullName(data.fullname);
             }
         } catch (e) {
             setError(e.message);
@@ -268,6 +269,7 @@ function Profile() {
         }
     };
 
+    // TODO need username and fullname to update on page after so new fetch
     const handleEditProfile = async (event) => {
         event.preventDefault();
         setError('');
@@ -298,6 +300,7 @@ function Profile() {
                         // "Invalid credentials"
                         console.log("invalid try in username");
                         setError("Username already exists");
+                        setProfileUserMessage("That username already exists, try again.");
                     }
                 } catch (e) {
                     console.error(e);
@@ -318,12 +321,15 @@ function Profile() {
                 
                 if (response.ok) {
                     console.log("new Name ", newName);
-
+                    setProfileNameMessage("Success in updating your Full Name");
+                    
                     event.target.name.value = '';
                 } else {
 
                     console.log("invalid try in new name")
                     setError("Something went wrong, try again");
+
+                    setProfileNameMessage("Something went wrong, try updating your full name again. ");
 
                     console.log(error)
                 }
@@ -336,7 +342,10 @@ function Profile() {
         }
     };
 
+    // TODO more descriptive error messages on frontend (error because old password wrong?)
     const handleEditPassword = async (event) => {
+        event.preventDefault();
+
         setError('');
         console.log("Clicked edit password button");
         // TODO fix
@@ -344,7 +353,7 @@ function Profile() {
         const newPassword = event.target.password.value;
         const newPassword2 = event.target.confirm_password.value;
         if (newPassword !== newPassword2) {
-            setError("Passwords don't match");
+            setProfilePasswordMessage("Passwords don't match, try again.");
             return;
         }
         
@@ -354,18 +363,20 @@ function Profile() {
                 headers: {
                 'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ oldPassword, newPassword }),
+                body: JSON.stringify({oldPassword, newPassword}),
             });
 
             if (response.ok) {
                 setProfilePasswordMessage("Password updated successfully");
-                console.log("New Password ", newPassword);
+
+                event.target.old_password.value = '';
                 event.target.password.value = '';
                 event.target.confirm_password.value = '';
             } else {
                 // "Invalid credentials"
                 console.log("invalid try in password")
                 setError("Something went wrong, try again!");
+                setProfilePasswordMessage("Something went wrong, try again!");
                 console.log(error)
             }
             let errorMessage = "Something went wrong";
@@ -394,7 +405,7 @@ function Profile() {
                 <h2>Current Profile Information</h2>
 
                 <label className="label">Full Name</label>
-                <h3 className="error">{profileNameMessage}</h3>
+                <h3 className="error">{fullName}</h3>
 
                 <label className="label">Username</label>
                 <h3 className="error">{username}</h3>
@@ -408,8 +419,16 @@ function Profile() {
                     <label className="label">New Full Name</label>
                     <input type="text" id="name" placeholder="Your name" />
 
+                    {profileNameMessage && (
+                        <p className="success">{profileNameMessage}</p>
+                    )}
+
                     <label className="label">New Username</label>
                     <input type="text" id="username" placeholder="funusernamexample" />
+
+                    {profileUserMessage && (
+                        <p className="success">{profileUserMessage}</p>
+                    )}
 
                     <button className="update-btn" type="submit">Update Profile</button>
                 </form>
@@ -421,10 +440,12 @@ function Profile() {
                 <form id="editpassword" method="post" onSubmit={handleEditPassword}>
                     
                     <label className="label">Current Password</label>
-                    <input type="password" name="password" placeholder="Current Password" required />
+                    <input type="password" id="old_password" placeholder="Current Password" required />
+
                     <label className="label">New Password</label>
                     <input type="password" id="password" placeholder="Password" required/>
-                    <label className="label">Retype Password</label>
+
+                    <label className="label">Retype New Password</label>
                     <input type="password" id="confirm_password" placeholder="Confirm Password" required/>
                     {profilePasswordMessage && (
                         <p className="success">{profilePasswordMessage}</p>
