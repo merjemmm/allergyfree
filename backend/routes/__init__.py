@@ -4,6 +4,7 @@ from backend.routes.calendar import calendar_bp
 from backend.routes.journal import journal_bp
 from backend.routes.profile import profile_bp
 from backend.routes.restaurants import restaurants_bp
+from backend.routes.stats import stats_bp
 
 def register_routes(app):
     # Register all blueprints here
@@ -12,3 +13,4 @@ def register_routes(app):
     app.register_blueprint(journal_bp, url_prefix="/api/journal/")
     app.register_blueprint(profile_bp, url_prefix="/api/profile/")
     app.register_blueprint(restaurants_bp, url_prefix="/api/restaurant/")
+    app.register_blueprint(stats_bp, url_prefix="/api/stats/")

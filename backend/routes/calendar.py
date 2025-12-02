@@ -1,7 +1,7 @@
 """allergyfree backend for calendar page"""
 from flask import Blueprint, jsonify, request
 from flask_login import current_user, login_required
-from backend.models import Symptom
+from backend.models import SymptomLog
 from datetime import datetime
 from sqlalchemy import extract
 
@@ -26,17 +26,17 @@ def get_entries():
         year = datetime.now().year
 
     query = SymptomLog.query.filter(
-        extract('year', Symptom.date) == year,
-        extract('month', Symptom.date) == month,
-        Syptom.adder==current_user.username)
+        extract('year', SymptomLog.date) == year,
+        extract('month', SymptomLog.date) == month,
+        SymptomLog.adder==current_user.username)
 
     
     if day:
         query = SymptomLog.query.filter(
-            extract('year', Symptom.date) == year,
-            extract('month', Symptom.date) == month,
-            extract('day', Symptom.date) == day,
-            Symptom.adder==current_user.username)
+            extract('year', SymptomLog.date) == year,
+            extract('month', SymptomLog.date) == month,
+            extract('day', SymptomLog.date) == day,
+            SymptomLog.adder==current_user.username)
         
     calendar_entries = query.all()
 

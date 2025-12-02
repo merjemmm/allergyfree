@@ -8,6 +8,7 @@ import JournalPage from "./pages/Journal"
 import RestaurantPage from './pages/Restaurants';
 import CalendarPage from './pages/Calendar';
 import User from './UserContext';
+import DashboardPage from './pages/Dashboard';
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
           <Route path="/restaurants" element={<RestaurantPage />} />
           <Route path="/calendar" element={<CalendarPage />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/dash" element={<DashboardPage />} />
         </Routes>
     </BrowserRouter>
     </User>
