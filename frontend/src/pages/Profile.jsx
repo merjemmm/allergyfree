@@ -15,6 +15,7 @@ function Profile() {
     let navigate = useNavigate();
     const [profileNameMessage, setProfileNameMessage] = useState('');
     const [profilePasswordMessage, setProfilePasswordMessage] = useState('');
+    const [fullname, setFullname] = useState('');
     const [profileUserMessage, setProfileUserMessage] = useState('');
 
     const [categories, setCategories] = useState([]);
@@ -35,7 +36,7 @@ function Profile() {
             if (!response.ok) {
                 setError(data.error);
             } else {
-                setProfileNameMessage(data.fullname);
+                setFullname(data.fullname);
             }
         } catch (e) {
             setError(e.message);
@@ -343,11 +344,13 @@ function Profile() {
                     if (response.ok) {
                         console.log("New Username ", newUsername);
                         setProfileUserMessage("Success in updating your Username");
+                        setUsername(newUsername);
                         event.target.username.value = '';
                     } else {
                         // "Invalid credentials"
                         console.log("invalid try in username");
                         setError("Username already exists");
+                        setProfileUserMessage("That username already exists, try again.");
                     }
                 } catch (e) {
                     console.error(e);
@@ -368,13 +371,14 @@ function Profile() {
                 
                 if (response.ok) {
                     console.log("new Name ", newName);
-
+                    setProfileNameMessage("Success in updating your Full Name");
+                    setFullname(newName);
                     event.target.name.value = '';
                 } else {
 
                     console.log("invalid try in new name")
                     setError("Something went wrong, try again");
-
+                    setProfileNameMessage("Something went wrong, try updating your full name again.");
                     console.log(error)
                 }
                 // await response.json()
@@ -390,14 +394,13 @@ function Profile() {
         event.preventDefault();
         setError('');
         console.log("Clicked edit password button");
-        // TODO fix
-        const oldPassword = event.target.password.value;
+        const oldPassword = event.target.old_password.value;
         const newPassword = event.target.confirm_password.value;
+
         if (newPassword !== event.target.password.value) {
             setError("Passwords don't match");
             return;
         }
-        
         try {
             let response = await fetchAPI("/api/profile/edit/password", {
                 method: 'POST',
@@ -440,7 +443,7 @@ function Profile() {
                             <h2>Current Profile Information</h2>
 
                             <label className="label">Full Name</label>
-                            <h3 className="error">{profileNameMessage}</h3>
+                            <h3 className="error">{fullname}</h3>
 
                             <label className="label">Username</label>
                             <h3 className="error">{username}</h3>
@@ -453,8 +456,16 @@ function Profile() {
                                 <label className="label">New Full Name</label>
                                 <input type="text" id="name" placeholder="Your name" />
 
+                                {profileNameMessage && (
+                                    <p className="success">{profileNameMessage}</p>
+                                )}
+
                                 <label className="label">New Username</label>
-                                <input type="text" id="username" placeholder="funusernamexample" />
+                                <input type="text" id="username" placeholder="funusernameexample" />
+
+                                {profileNameMessage && (
+                                    <p className="success">{profileUserMessage}</p>
+                                )}
 
                                 <button className="update-btn" type="submit">Update Profile</button>
                             </form>

@@ -118,13 +118,20 @@ def update_password():
     if not (old_password and new_password):
         return jsonify({"status": "fail", 
                         "message": "Missing new or old password"}), 400
-
+    
     user = User.query.filter_by(username=current_user.username).first()
+
+    print(f"user: {user}")
+    print(f"username: {user.username}")
+    print(f"password: {user.password}")
 
     if not user:
         print("user does not exist")
         return jsonify({"status": "fail", 
                         "message": "User does not exist"}), 403
+
+    print(f"Stored hash: {user.password}")
+    print(f"Input password: {old_password}")
 
     if not check_password_hash(user.password, old_password):
         print("passwords don't match")
@@ -135,8 +142,8 @@ def update_password():
     db.session.commit()
     return jsonify({"status": "success", 
                     "message": "Password updated successfully"}), 200
-    
-    
+
+
 @profile_bp.route('/edit/username', methods=["POST"])
 @login_required
 def update_username():
