@@ -112,29 +112,26 @@ def add_account_category():
 def update_password():
     data = request.get_json()
     
-    old_password = data.get('password')
-    new_password1 = data.get('newPassword1')
-    new_password2 = data.get('newPassword2')
+    old_password = data.get('oldPassword')
+    new_password = data.get('newPassword')
 
-    if not (old_password and new_password1 and new_password2):
+    if not (old_password and new_password):
         return jsonify({"status": "fail", 
                         "message": "Missing new or old password"}), 400
-        
-    if new_password1 != new_password2:
-        return jsonify({"status": "fail", 
-                        "message": "The new passwords don't match"}), 400
 
     user = User.query.filter_by(username=current_user.username).first()
 
     if not user:
+        print("user does not exist")
         return jsonify({"status": "fail", 
                         "message": "User does not exist"}), 403
 
     if not check_password_hash(user.password, old_password):
+        print("passwords don't match")
         return jsonify({"status": "fail", 
                         "message": "Old password incorrect"}), 403
 
-    user.password = generate_password_hash(new_password1)
+    user.password = generate_password_hash(new_password)
     db.session.commit()
     return jsonify({"status": "success", 
                     "message": "Password updated successfully"}), 200
@@ -206,7 +203,6 @@ def get_categories():
     return jsonify(categories), 200
 
 
-
 # GET that seeds defaults once per user 
 # retrieve symptoms
 @profile_bp.route('/symptoms', methods=['GET'])
@@ -251,3 +247,9 @@ def get_symptoms():
         "data": [symptom_to_dict(s) for s in existing]
     }), 200
 
+# returns user's Full Name to be displayed on profile
+@profile_bp.route('/fullname', methods=['GET'])
+@login_required
+def get_fullname():
+    user = User.query.filter_by(username=current_user.username).first()
+    return jsonify({"fullname": user.fullname}), 200

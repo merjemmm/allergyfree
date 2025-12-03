@@ -22,6 +22,30 @@ function Profile() {
     // track which symptom toggles are actually on
     const [activeSymptoms, setActiveSymptoms] = useState([]);
 
+    const fetchUserFullname = async () => {
+        setError('');
+        try {
+            const response = await fetchAPI("/api/profile/fullname", {
+                method: 'GET',
+                headers: {
+                'Content-Type': 'application/json'
+                },
+            });
+            const data = await response.json();
+            if (!response.ok) {
+                setError(data.error);
+            } else {
+                setProfileNameMessage(data.fullname);
+            }
+        } catch (e) {
+            setError(e.message);
+        }
+    };
+
+    useEffect(() => {
+     fetchUserFullname();
+    }, []);
+
     // all symptoms grouped by category from backend
     const [symptomsByCategory, setSymptomsByCategory] = useState({});
 
@@ -293,13 +317,13 @@ function Profile() {
         }
     };
 
+
     const handleEditProfile = async (event) => {
         event.preventDefault();
         setError('');
         console.log("Clicked edit profile button");
 
         const newUsername = event.target.username.value;
-        const newPassword = event.target.password.value;
         const newName = event.target.name.value;
 
         if (newUsername) {
@@ -311,14 +335,14 @@ function Profile() {
                     let response = await fetchAPI("/api/profile/edit/username", {
                         method: 'POST',
                         headers: {
-                            'Content-Type': 'application/json'
+                        'Content-Type': 'application/json'
                         },
-                        body: JSON.stringify({ newUsername }),
+                        body: JSON.stringify({newUsername}),
                     });
-
+                    
                     if (response.ok) {
                         console.log("New Username ", newUsername);
-                        setProfileUserMessage("Sucess in updating your Username");
+                        setProfileUserMessage("Success in updating your Username");
                         event.target.username.value = '';
                     } else {
                         // "Invalid credentials"
@@ -332,45 +356,16 @@ function Profile() {
             }
         }
 
-        // TODO - need to make more special teh password change
-        if (newPassword) {
-            try {
-                let response = await fetchAPI("/api/profile/edit/password", {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ newPassword }),
-                });
-
-                if (response.ok) {
-                    console.log("New Password ", newPassword);
-                    event.target.password.value = '';
-                } else {
-                    // "Invalid credentials"
-                    console.log("invalid try in password")
-                    setError("Something went wrong, try again!");
-
-                    console.log(error)
-                }
-                // await response.json()
-                //     .then(d => setError(d.error));
-            } catch (e) {
-                console.error(e);
-                setError(e.message);
-            }
-        }
-
         if (newName) {
             try {
                 let response = await fetchAPI("/api/profile/edit/fullname", {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                    'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ newName }),
+                    body: JSON.stringify({newName}),
                 });
-
+                
                 if (response.ok) {
                     console.log("new Name ", newName);
 
@@ -391,14 +386,56 @@ function Profile() {
         }
     };
 
+    const handleEditPassword = async (event) => {
+        event.preventDefault();
+        setError('');
+        console.log("Clicked edit password button");
+        // TODO fix
+        const oldPassword = event.target.password.value;
+        const newPassword = event.target.confirm_password.value;
+        if (newPassword !== event.target.password.value) {
+            setError("Passwords don't match");
+            return;
+        }
+        
+        try {
+            let response = await fetchAPI("/api/profile/edit/password", {
+                method: 'POST',
+                headers: {
+                'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ oldPassword, newPassword }),
+            });
+
+            if (response.ok) {
+                setProfilePasswordMessage("Password updated successfully");
+                console.log("New Password ", newPassword);
+                event.target.password.value = '';
+                event.target.confirm_password.value = '';
+            } else {
+                // "Invalid credentials"
+                console.log("invalid try in password")
+                setError("Something went wrong, try again!");
+                console.log(error)
+            }
+            let errorMessage = "Something went wrong";
+            if (response.headers.get("content-type")?.includes("application/json")) {
+                const data = await response.json();
+                errorMessage = data.error || errorMessage;
+            }
+            setError(errorMessage);
+        } catch (e) {
+            console.error(e);
+            setError(e.message);
+        }
+    };
+
     return (
         <>
             <Navbar />
             <div className="wrap">
                 <div className="grid">
                     <div>
-
-                        {/* TODO - need something to display current infomration for user */}
                         <section className="card profile-card">
                             <h2>Current Profile Information</h2>
 
@@ -407,10 +444,7 @@ function Profile() {
 
                             <label className="label">Username</label>
                             <h3 className="error">{username}</h3>
-
                         </section>
-
-
 
                         <section className="card profile-card">
                             <h2>Edit Profile Information</h2>
@@ -419,27 +453,29 @@ function Profile() {
                                 <label className="label">New Full Name</label>
                                 <input type="text" id="name" placeholder="Your name" />
 
-                                {profileNameMessage && (
-                                    <p className="error">{profileNameMessage}</p>
-                                )}
-
                                 <label className="label">New Username</label>
-                                <input id="username" placeholder="funusernamexample" />
-
-                                {profileUserMessage && (
-                                    <p className="error">{profileUserMessage}</p>
-                                )}
-
-
-                                <label className="label">New Password</label>
-                                <input type="password" id="password" placeholder="••••••••" />
-
-                                {profilePasswordMessage && (
-                                    <p className="error">{profilePasswordMessage}</p>
-                                )}
-
+                                <input type="text" id="username" placeholder="funusernamexample" />
 
                                 <button className="update-btn" type="submit">Update Profile</button>
+                            </form>
+                        </section>
+
+                        <section className="card profile-card">
+                            <h2>Edit Password</h2>
+
+                            <form id="editpassword" method="post" onSubmit={handleEditPassword}>
+                                
+                                <label className="label">Current Password</label>
+                                <input type="password" name="old_password" id="old_password" placeholder="Current Password" required />
+                                <label className="label">New Password</label>
+                                <input type="password" id="password" placeholder="Password" required/>
+                                <label className="label">Retype Password</label>
+                                <input type="password" id="confirm_password" placeholder="Confirm Password" required/>
+                                {profilePasswordMessage && (
+                                    <p className="success">{profilePasswordMessage}</p>
+                                )}
+
+                                <button className="update-btn" type="submit">Update Password</button>
                             </form>
                         </section>
 
@@ -485,7 +521,7 @@ function Profile() {
 
                     <aside className="card symptoms-card">
                         <h2>
-                            Symptoms to Track <span className="muted"><br />(Select all that apply. Unselecting will delete the symptom.)</span>
+                            Symptoms to Track <span className="muted"><br />Click on symptoms to delete.</span>
                         </h2>
 
                         {/* For each category, it renders a section with colored sympto tags */}

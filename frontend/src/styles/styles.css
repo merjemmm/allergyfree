@@ -690,8 +690,10 @@ textarea {
       background:var(--panel);
       background-color: #faf9f5; 
       border-radius:14px;
-      padding:20px;
+      padding: 20px;
+      padding-right: 35px;
       box-shadow: var(--shadow);
+      margin: 15px;
     }
 
     .profile-card h2, .add-symptom h2, .symptoms-card h2{
