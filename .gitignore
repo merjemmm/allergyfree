@@ -14,3 +14,5 @@ node_modules/
 
 # Loval DB
 curr_db/
+
+rand_test.py

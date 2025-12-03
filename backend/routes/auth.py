@@ -32,7 +32,7 @@ def handle_login():
     username = data.get("username")
     password = data.get("password")
 
-    # If the username or password fields are empty, abort(400)
+    # If the username or password fields are empty, return an error
     if not username or not password:
         return jsonify({"status" : "fail",
                         "message" : "Missing username or password"}), 403

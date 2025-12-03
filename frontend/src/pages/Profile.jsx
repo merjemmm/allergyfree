@@ -318,7 +318,6 @@ function Profile() {
         }
     };
 
-
     const handleEditProfile = async (event) => {
         event.preventDefault();
         setError('');
@@ -375,7 +374,6 @@ function Profile() {
                     setFullname(newName);
                     event.target.name.value = '';
                 } else {
-
                     console.log("invalid try in new name")
                     setError("Something went wrong, try again");
                     setProfileNameMessage("Something went wrong, try updating your full name again.");
@@ -396,7 +394,6 @@ function Profile() {
         console.log("Clicked edit password button");
         const oldPassword = event.target.old_password.value;
         const newPassword = event.target.confirm_password.value;
-
         if (newPassword !== event.target.password.value) {
             setError("Passwords don't match");
             return;
@@ -407,18 +404,20 @@ function Profile() {
                 headers: {
                 'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ oldPassword, newPassword }),
+                body: JSON.stringify({oldPassword, newPassword}),
             });
 
             if (response.ok) {
                 setProfilePasswordMessage("Password updated successfully");
-                console.log("New Password ", newPassword);
+
+                event.target.old_password.value = '';
                 event.target.password.value = '';
                 event.target.confirm_password.value = '';
             } else {
                 // "Invalid credentials"
                 console.log("invalid try in password")
                 setError("Something went wrong, try again!");
+                setProfilePasswordMessage("Something went wrong, try again!");
                 console.log(error)
             }
             let errorMessage = "Something went wrong";
@@ -529,7 +528,6 @@ function Profile() {
 
                     </div>
 
-
                     <aside className="card symptoms-card">
                         <h2>
                             Symptoms to Track <span className="muted"><br />Click on symptoms to delete.</span>
@@ -548,7 +546,7 @@ function Profile() {
                                                     : "pill--inactive"
                                                 }`}
                                             onClick={() => handleToggleSymptom(category, name)}
-                                        >
+                                            >
                                             {name}
                                         </span>
                                     ))}

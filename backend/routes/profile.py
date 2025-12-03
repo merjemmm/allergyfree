@@ -147,7 +147,6 @@ def update_password():
 @profile_bp.route('/edit/username', methods=["POST"])
 @login_required
 def update_username():
-    
     data = request.get_json()
     
     new_username = data.get('newUsername')
