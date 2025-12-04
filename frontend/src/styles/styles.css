@@ -91,6 +91,8 @@ body {
     margin: 0;
     font-family: "Poppins", sans-serif;
     background-color: var(--medium-beige);
+    /* use same font as Figma */
+    font-family: 'Quicksand', sans-serif;
 }
 
 /* Navbar */
@@ -191,6 +193,24 @@ input, textarea, select {
 textarea {
     resize: vertical;
     min-height: 60px;
+}
+
+/* Home page styles */
+
+#title {
+  font-size: 3.5rem;
+  font-weight: normal;
+}
+
+#background-info {
+  width: 80%;
+  font-size: 14pt;
+}
+
+/* (end homepage-specific styles) */
+
+#bold-link {
+  font-weight: bold;
 }
 
 .symptom-list {

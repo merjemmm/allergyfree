@@ -45,7 +45,7 @@ function SignupPage() {
     return (
         <>
         <div id="sidebar">
-            <h1> Allergy Free Around Me </h1>
+            <h1 id="title"> Allergy Free Around Me </h1>
         </div>
         <div id="login-content">
             <div id="slogan">
@@ -93,7 +93,7 @@ function SignupPage() {
                 <button type="submit" onClick={(e) => handleSignup(e, username, password)}>Register</button>
             </form>
             <p>Already have an account? 
-                <Link to="/login">
+                <Link to="/login" id="bold-link">
                     Log in!
                 </Link>
             </p>
