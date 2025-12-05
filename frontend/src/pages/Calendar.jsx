@@ -7,6 +7,56 @@ import Navbar from "../components/NavBar";
 import '../styles/styles.css';
 
 function Calendar() {
+    const [error, setError] = useState('');
+
+    // const [formData, setFormData] = useState({
+    //     meal: "Snack",
+    //     ingredients: "",
+    //     food: "",
+    //     notes: "",
+    //     symptoms: "",
+
+    // });
+    
+    const [entries, setEntries] = useState([]);
+
+    const loadEntries = async() => {
+        //e.preventDefault()
+        const date = new Date()
+
+        try {
+            const response = await fetchAPI(`/api/calendar/entries?month=${date.getMonth() + 1}`, {
+                method: 'GET',
+                headers: { 'Content-type': 'application/json' },
+            });
+
+            const data = await response.json(); // parse json
+
+            console.log(data);
+
+            if (!response.ok) {
+                console.error("Failed to load journal entries:", data);
+                setError("Cant retrieve journal entries for today.")
+                return;
+            } else {
+                const mapped = data.entries.map((r) => ({
+                    id: r.id,
+                    // user: r.name,
+                    type: r.type,
+                    symptoms: r.symptom
+                }));
+                setEntries(mapped);
+            }
+        } catch (err) {
+            console.error("Error loading calendar entries:", err);
+            setError("Cant retrieve calendar entries for this month.")
+        }
+    };
+
+    useEffect(() => {
+        loadEntries();
+    }, []);
+
     return (
         <>
         <Navbar />

@@ -9,11 +9,6 @@ import '../styles/styles.css';
 
 
 function Journal() {
-    // const [meal, setMeal] = useState("");
-    // const [food, setFood] = useState("");
-    // const [ingredients, setIngredients] = useState("");
-    // const [notes, setNotes] = useState("");
-    // const [symptoms, setSymptoms] = useState("");
     const [error, setError] = useState('');
 
     const [formData, setFormData] = useState({
@@ -25,8 +20,8 @@ function Journal() {
 
     });
     
-    const [entries, setEntries] = useState([])
-    const [entriesToday, setEntriesToday] = useState([])
+    const [entries, setEntries] = useState([]);
+    const [entriesToday, setEntriesToday] = useState([]);
 
     const mealTypes = [
         {value: "Snack", label: "Snack"},

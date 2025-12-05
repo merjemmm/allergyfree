@@ -44,7 +44,7 @@ def get_entries():
     def symptom_to_dict(sym):
         return {
             "id": sym.id,
-            "user": sym.user,
+            # "user": sym.user,
             "symptom": sym.symptom,
             "type": sym.type
         }
