@@ -91,6 +91,8 @@ body {
     margin: 0;
     font-family: "Poppins", sans-serif;
     background-color: var(--medium-beige);
+    /* use same font as Figma */
+    font-family: 'Quicksand', sans-serif;
 }
 
 /* Navbar */
@@ -149,7 +151,7 @@ body {
 }
 
 .card {
-    background-color: var(--light-beige);
+    background-color: #faf9f5; 
     border-radius: 12px;
     box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.1);
     padding: 1.5rem;
@@ -191,6 +193,24 @@ input, textarea, select {
 textarea {
     resize: vertical;
     min-height: 60px;
+}
+
+/* Home page styles */
+
+#title {
+  font-size: 3.5rem;
+  font-weight: normal;
+}
+
+#background-info {
+  width: 80%;
+  font-size: 14pt;
+}
+
+/* (end homepage-specific styles) */
+
+#bold-link {
+  font-weight: bold;
 }
 
 .symptom-list {
@@ -241,7 +261,6 @@ textarea {
   padding: 1.5rem;
   background-color: #faf9f5;
   border-radius: 12px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
 .entry-form.card {
@@ -463,6 +482,53 @@ textarea {
 }
 
 /* --- Calendar Page Styles --- */
+/* --- Add-symptom form (Calendar page) --- */
+
+.add-form {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  border-radius: 8px;
+  background: #f7f7ef;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.add-form-row label {
+  font-size: 0.85rem;
+  color: #46562b;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.add-form-row select,
+.add-form-row input[type="time"] {
+  padding: 0.4rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background: white;
+}
+
+.add-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.cancel-btn {
+  background: #f1f1e3;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 0.4rem 0.8rem;
+  cursor: pointer;
+}
+
+.calendar.card,
+.day-entries.card {
+  background-color: #faf9f5; 
+}
 
 .calendar-container {
   display: flex;
@@ -470,12 +536,14 @@ textarea {
   padding: 2rem;
   justify-content: center;
   align-items: flex-start;
+  background-color: #faf9f5; 
 }
 
 /* Left: Calendar section */
 .calendar {
   flex: 1.3;
   padding: 1.5rem;
+  background-color: #faf9f5; 
 }
 
 .calendar-header {
@@ -534,11 +602,12 @@ textarea {
   border-radius: 50%;
 }
 
-.dot.green { background: #cddf7d; }
+.dot.green { background: #b3d031; }
 .dot.blue { background: #8fb8e3; }
-.dot.pink { background: #f4a9b9; }
-.dot.red { background: #e97777; }
-.dot.yellow { background: #e9e59f; }
+.dot.pink { background: #ffa8b7; }
+.dot.orange { background: orange;}
+.dot.red { background: #e86464; }
+.dot.yellow { background: #FADD08; }
 .dot.purple { background: #b19cd9; }
 .dot.lavender { background: #cbb7ed; }
 
@@ -563,10 +632,12 @@ textarea {
 }
 
 .tag.blue { background: #8fb8e3; }
-.tag.pink { background: #f4a9b9; }
-.tag.red { background: #e97777; }
+.tag.pink { background: #f895a5; }
+.tag.red { background: #e87272; }
 .tag.purple { background: #b19cd9; }
 .tag.lavender { background: #cbb7ed; }
+.tag.green { background: #b3d031; }
+.tag.orange { background: #fdb022;}
 
 .toggle-btn {
   background: #46562b;
@@ -639,9 +710,12 @@ textarea {
 
     .card{
       background:var(--panel);
+      background-color: #faf9f5; 
       border-radius:14px;
-      padding:20px;
-      box-shadow: var(--shadow);
+      padding: 20px;
+      padding-right: 35px;
+      margin: 15px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.15);
     }
 
     .profile-card h2, .add-symptom h2, .symptoms-card h2{
@@ -699,6 +773,8 @@ textarea {
       display:flex;
       flex-direction:column;
       gap:12px;
+      background-color: #faf9f5; 
+
     }
 
     .tag-list{
@@ -715,7 +791,7 @@ textarea {
 
     .pill{
       padding:8px 12px;
-      border-radius:var(--pill-radius);
+      border-radius: 50px;/*var(--pill-radius);*/
       font-size:0.9rem;
       color:#2a2a2a;
       display:inline-block;
@@ -724,11 +800,28 @@ textarea {
       user-select:none;
     }
 
-    .pill.pink{ background:#f6b8b8; }
-    .pill.orange{ background:#f1caa4; }
+    .pill.pink{ background:rgb(255, 200, 209); }
+    .pill.orange{ background:#fcca98; }
     .pill.green{ background:#dfe8a9; }
     .pill.blue{ background:#cfe3ff; }
     .pill.purple{ background:#d6ccf5; }
+    .pill.red{ background: #ff9393;;}
+
+    /* === Pill toggle states === */
+    /* When a pill is OFF, we override its color and make it muted */
+    .pill.pill--inactive {
+      background-color: #fbfbfa !important;  /* overrides .pill.pink/orange/etc. */
+      border: 1px solid #e3e3d0;
+      color: #6a6a55;
+      opacity: 0.7;
+    }
+
+    /* When a pill is ON, keep its category color and give it a bit of emphasis */
+    .pill.pill--active {
+      border: 1px solid rgba(0,0,0,0.05);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.12);
+      opacity: 1;
+    }
 
     .symptoms-list{
       margin-top:6px;

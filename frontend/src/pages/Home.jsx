@@ -12,14 +12,14 @@ function HomePage() {
   return (
     <>
 			<div id="sidebar">
-				<h1> Allergy Free Around Me </h1>
+				<h1 id="title"> Allergy Free Around Me </h1>
 			</div>
 			<div id="login-content">
 				<div id="slogan">
 					<h2>Find the food that loves you back.</h2>
 					<img src={Heart}/>
 				</div>
-        <div>
+        <div id="background-info">
           <p>
             Allergy Free Around Me is an all-in-one tool for managing your chronic 
             symptoms. Whether you have allergic reactions you'd like to track, 
@@ -30,14 +30,14 @@ function HomePage() {
         </div>
         <div>
           <p>Don't have an account? 
-            <Link to="/signup" >
+            <Link to="/signup" id="bold-link">
               &nbsp; Sign Up Here!
             </Link>
           </p>
         </div>
         <div>
           <p>Have an account? 
-            <Link to="/login" >
+            <Link to="/login" id="bold-link">
               &nbsp; Log In Here!
             </Link>
           </p>

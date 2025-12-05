@@ -53,7 +53,7 @@ function LoginPage() {
 	return (
 		<>
 			<div id="sidebar">
-				<h1> Allergy Free Around Me </h1>
+				<h1 id="title"> Allergy Free Around Me </h1>
 			</div>
 			<div id="login-content">
 				<div id="slogan">
@@ -86,7 +86,7 @@ function LoginPage() {
             <button type="submit">Log In</button>
 					</form>
 					<p>Don't have an account? 
-            <Link to="/signup">
+            <Link to="/signup" id="bold-link">
               Sign Up!
             </Link>
           </p>
