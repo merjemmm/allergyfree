@@ -9,12 +9,13 @@ import '../styles/styles.css';
 // this is where the colors for each category will be added (?) 
 // sorry if this was already taken care of in the backend lol
 const TYPE_TO_COLORS = {
-    Dermatological: { dotClass: "red", tagClass: "red" },
-    Respiratory: { dotClass: "blue", tagClass: "blue" },
-    GI: { dotClass: "purple", tagClass: "purple" },
-    Neurological: { dotClass: "pink", tagClass: "pink" },
-    General: { dotClass: "green", tagClass: "green" },
-};
+    "Dermatological": { dotClass: "red", tagClass: "red" },
+    "Respiratory": { dotClass: "orange", tagClass: "orange" },
+    "GI / Intestinal": { dotClass: "purple", tagClass: "purple" },
+    "Mental / Cognitive": { dotClass: "blue", tagClass: "blue" },
+    "General": { dotClass: "pink", tagClass: "pink" },
+    "Musculoskeletal": { dotClass: "green", tagClass: "green" },
+}
 
 function Calendar() {
     const today = new Date(); // get today's real date
