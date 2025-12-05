@@ -57,13 +57,13 @@ function Profile() {
         we need to store whatever their chosen colors are and apply them
     */
     const CATEGORY_TO_COLOR = {
-        "Dermatological": "pink",
+        "Dermatological": "red",
         "Respiratory": "orange",
         "Musculoskeletal": "green",
         "Mental / Cognitive": "blue",
         "GI / Intestinal": "purple",
     };
-    const getPillColorClass = (category) => CATEGORY_TO_COLOR[category] || "red";
+    const getPillColorClass = (category) => CATEGORY_TO_COLOR[category] || "pink";
 
     // helper func: make unique key of category+label
     const makeSymptomKey = (category, label) => `${category}::${label}`;
