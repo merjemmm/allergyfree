@@ -602,11 +602,12 @@ textarea {
   border-radius: 50%;
 }
 
-.dot.green { background: #cddf7d; }
+.dot.green { background: #b3d031; }
 .dot.blue { background: #8fb8e3; }
-.dot.pink { background: #f4a9b9; }
-.dot.red { background: #e97777; }
-.dot.yellow { background: #e9e59f; }
+.dot.pink { background: #ffa8b7; }
+.dot.orange { background: orange;}
+.dot.red { background: #e86464; }
+.dot.yellow { background: #FADD08; }
 .dot.purple { background: #b19cd9; }
 .dot.lavender { background: #cbb7ed; }
 
@@ -631,10 +632,12 @@ textarea {
 }
 
 .tag.blue { background: #8fb8e3; }
-.tag.pink { background: #f4a9b9; }
-.tag.red { background: #e97777; }
+.tag.pink { background: #f895a5; }
+.tag.red { background: #e87272; }
 .tag.purple { background: #b19cd9; }
 .tag.lavender { background: #cbb7ed; }
+.tag.green { background: #b3d031; }
+.tag.orange { background: #fdb022;}
 
 .toggle-btn {
   background: #46562b;
@@ -797,11 +800,12 @@ textarea {
       user-select:none;
     }
 
-    .pill.pink{ background:#f6b8b8; }
-    .pill.orange{ background:#f1caa4; }
+    .pill.pink{ background:rgb(255, 200, 209); }
+    .pill.orange{ background:#fcca98; }
     .pill.green{ background:#dfe8a9; }
     .pill.blue{ background:#cfe3ff; }
     .pill.purple{ background:#d6ccf5; }
+    .pill.red{ background: #ff9393;;}
 
     /* === Pill toggle states === */
     /* When a pill is OFF, we override its color and make it muted */
