@@ -15,6 +15,7 @@ function Journal() {
     // const [notes, setNotes] = useState("");
     // const [symptoms, setSymptoms] = useState("");
     const [error, setError] = useState('');
+    const [symptoms, setSymptoms] = useState([])
 
     const [formData, setFormData] = useState({
         meal: "Snack",
@@ -22,7 +23,6 @@ function Journal() {
         food: "",
         notes: "",
         symptoms: "",
-
     });
     
     const [entries, setEntries] = useState([])
@@ -72,6 +72,7 @@ function Journal() {
 
     const loadEntries = async() => {
         //e.preventDefault()
+        console.log("loading entries")
         const date = new Date()
 
         try {
@@ -108,6 +109,7 @@ function Journal() {
 
     useEffect(() => {
         loadEntries();
+        loadSymptoms();
     }, []);
 
     const handleSubmit = async (event) => {
@@ -172,6 +174,35 @@ function Journal() {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
+    const loadSymptoms = async () => {
+        console.log("Loading symptoms!")
+        try {
+            const response = await fetchAPI("/api/profile/symptoms", {
+                method: "GET",
+                headers: { "Content-Type": "application/json" },
+            });
+            const data = await response.json();
+
+            if (!response.ok) {
+                console.error("Failed to load symptoms:", data);
+                setError(data.error || "Failed to load symptoms");
+                return;
+            }
+
+            const list = Array.isArray(data)
+                ? data
+                : data && Array.isArray(data.data)
+                    ? data.data
+                    : [];
+
+            console.log(list)
+            setSymptoms(list)
+        } catch (e) {
+            console.error("Error fetching symptoms", e);
+            setError(e.message);
+        }
+    };
+
     return (
         <>
         <Navbar />
@@ -228,9 +259,11 @@ function Journal() {
                     value={formData.symptoms}
                     onChange={handleChange}
                 >
-                    <option value="">Symptoms</option>
-                    <option>Headache</option>
-                    <option>Trouble breathing</option>
+                    {symptoms.map((s) => (
+                        <option>
+                            {s.symptom_name}
+                        </option>
+                    ))}
                 </select>
 
                 <button className="save-btn">Save Entry</button>
