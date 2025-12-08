@@ -16,6 +16,7 @@ function Journal() {
     // const [symptoms, setSymptoms] = useState("");
     const [error, setError] = useState('');
     const [symptoms, setSymptoms] = useState([])
+    const [expandedIdx, setExpandedIdx] = useState(null);
 
     const [formData, setFormData] = useState({
         meal: "Snack",
@@ -259,6 +260,9 @@ function Journal() {
                     value={formData.symptoms}
                     onChange={handleChange}
                 >
+                    <option>
+                        No symptom
+                    </option>
                     {symptoms.map((s) => (
                         <option>
                             {s.symptom_name}
@@ -271,20 +275,24 @@ function Journal() {
             </div>
 
             <div className="right-panel">
-            <div className="entry-card">
-                <h3>Today's Entries</h3>
-                <div className="entry-section">
-                    {entries.map((entry) => (
-                        <div className="entry"><span>{entry.meal}: {entry.food}</span><small>{entry.created}</small></div>
-                    ))}
-                </div>
-            </div>
 
             <div className="entry-card">
                 <h3>All Entries</h3>
                 <div className="entry-section">
-                    {entries.map((entry) => (
-                        <div className="entry"><span>{entry.meal}: {entry.food}</span><small>{entry.created}</small></div>
+                    {entries.map((entry, i) => (
+                        <div>
+                            <div className="entry" onClick={() => setExpandedIdx(prev => (prev == i ? null : i))}>
+                                <span>{entry.meal}: {entry.food}</span><small>{entry.created}</small>
+                            </div>
+
+                            {expandedIdx == i && (
+                                <div>
+                                    {entry.symptoms && (<p><b>Symptom:</b> {entry.symptoms}</p>)}
+                                    {entry.ingred && (<p><b>Ingredients:</b> {entry.ingred}</p>)}
+                                    {entry.notes && (<p><b>Notes:</b> {entry.notes}</p>)}
+                                </div>
+                            )}
+                        </div>
                     ))}
                 </div>
             </div>
