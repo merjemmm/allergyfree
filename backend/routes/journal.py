@@ -79,3 +79,22 @@ def add_journal():
         "status": "success",
         "message": "Journal entry added successfully"
     }), 200
+
+
+@journal_bp.route("/delete/<int:journal_id>/", methods=["DELETE"])
+@login_required
+def delete_journal(journal_id):
+    if not journal_id:
+        return jsonify({"status": "fail", 
+                        "message": "Missing restaurant id"}), 400
+
+    entry = Journal.query.get(int(journal_id))
+    if not entry:
+        return jsonify({"status": "fail", 
+                        "message": "Restaurant does not exist"}), 400
+        
+    db.session.delete(entry)
+    db.session.commit()
+
+    return jsonify({"status": "success", 
+                    "message": "Journal entry deleted successfully"}), 200

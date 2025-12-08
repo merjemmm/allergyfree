@@ -17,6 +17,7 @@ function Journal() {
     const [error, setError] = useState('');
     const [symptoms, setSymptoms] = useState([])
     const [expandedIdx, setExpandedIdx] = useState(null);
+    const [selected, setSelected] = useState([]);
 
     const [formData, setFormData] = useState({
         meal: "Snack",
@@ -283,7 +284,24 @@ function Journal() {
                         <div>
                             <div className="entry" onClick={() => setExpandedIdx(prev => (prev == i ? null : i))}>
                                 <span>{entry.meal}: {entry.food}</span><small>{entry.created}</small>
+
+                                <div className="summary-right">
+                                    <input
+                                        type="checkbox"
+                                        className="entry-checkbox"
+                                        checked={selected.includes(entry.id)}
+                                        onClick={(e) => e.stopPropagation()}
+                                        onChange={() => {
+                                            if (selected.includes(entry.id)) {
+                                                setSelected(selected.filter(id => id !== entry.id));
+                                            } else {
+                                                setSelected([...selected, entry.id]);
+                                            }
+                                        }}
+                                    />
+                                </div>
                             </div>
+
 
                             {expandedIdx == i && (
                                 <div>
@@ -294,6 +312,33 @@ function Journal() {
                             )}
                         </div>
                     ))}
+
+                    <button
+                        className="delete-btn"
+                        onClick={async () => {
+
+                            try {
+                                // delete each selected ID via backend
+                                await Promise.all(
+                                    selected.map((id) =>
+                                        fetchAPI(`/api/journal/delete/${id}/`, {
+                                            method: "DELETE",
+                                        })
+                                    )
+                                );
+
+                                // update local state
+                                setEntries(
+                                    entries.filter((entry) => !selected.includes(entry.id))
+                                );
+                                setSelected([]); // reset 
+                            } catch (err) {
+                                console.error("Error deleting journal entries:", err);
+                            }
+                        }}
+                    >
+                        Delete All Selected
+                    </button>
                 </div>
             </div>
             </div>
